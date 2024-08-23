@@ -12,7 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reports', function (Blueprint $table) {
-            $table->id();
+            $table->id(); 
+            $table->foreignId('ct_scan_id')->constrained('ct_scans')->onDelete('cascade');
+            $table->foreignId('doctor_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('patient_id')->constrained('users')->onDelete('cascade');
+            $table->text('report_content'); 
+            $table->enum('status', ['draft', 'finalized'])->default('draft');
             $table->timestamps();
         });
     }
