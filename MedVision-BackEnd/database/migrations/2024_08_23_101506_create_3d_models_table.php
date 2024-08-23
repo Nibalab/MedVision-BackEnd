@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('3d_models', function (Blueprint $table) {
-            $table->id();
+            $table->id(); 
+            $table->foreignId('ct_scan_id')->constrained('ct_scans')->onDelete('cascade');
+            $table->string('model_path'); 
             $table->timestamps();
         });
     }
