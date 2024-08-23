@@ -12,7 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('annotations', function (Blueprint $table) {
-            $table->id();
+            $table->id(); 
+            $table->foreignId('model_id')->constrained('3d_models')->onDelete('cascade');
+            $table->foreignId('doctor_id')->constrained('users')->onDelete('cascade');
+            $table->text('content'); 
+            $table->string('position')->nullable(); 
             $table->timestamps();
         });
     }
