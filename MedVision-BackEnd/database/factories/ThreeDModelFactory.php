@@ -2,22 +2,20 @@
 
 namespace Database\Factories;
 
+use App\Models\CtScan;
+use App\Models\ThreeDModel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ThreeDModel>
- */
 class ThreeDModelFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-    public function definition(): array
+    protected $model = ThreeDModel::class;
+
+    public function definition()
     {
         return [
-            //
+            'ct_scan_id' => CtScan::factory(),
+            'model_path' => $this->faker->filePath(),
         ];
     }
 }
+
