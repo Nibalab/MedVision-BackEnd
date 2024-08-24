@@ -2,22 +2,23 @@
 
 namespace Database\Factories;
 
+use App\Models\Annotation;
+use App\Models\ThreeDModel;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Annotation>
- */
 class AnnotationFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-    public function definition(): array
+    protected $model = Annotation::class;
+
+    public function definition()
     {
         return [
-            //
+            'model_id' => ThreeDModel::factory(),
+            'doctor_id' => User::factory()->create(['role' => 'doctor'])->id,
+            'content' => $this->faker->sentence,
+            'position' => $this->faker->randomElement(['top-left', 'top-right', 'bottom-left', 'bottom-right']),
         ];
     }
 }
+
