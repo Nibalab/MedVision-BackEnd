@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class ThreeDModel extends Model
 {
+    use HasFactory;
+
+    protected $table = '3d_models';
+
     protected $fillable = ['ct_scan_id', 'model_path'];
 
     public function ctScan()

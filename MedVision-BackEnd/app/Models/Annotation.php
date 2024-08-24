@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Annotation extends Model
 {
+    use HasFactory;
+    
     protected $fillable = ['model_id', 'doctor_id', 'content', 'position'];
 
     public function threeDModel()

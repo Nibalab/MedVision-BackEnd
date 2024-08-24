@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class CtScan extends Model
 {
+    use HasFactory;
+    
     protected $fillable = ['doctor_id', 'patient_id', 'file_path'];
 
     public function doctor()
