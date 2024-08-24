@@ -12,17 +12,25 @@ class CtScanController extends Controller
         $request->validate([
             'doctor_id' => 'required|exists:users,id',
             'patient_id' => 'required|exists:users,id',
-            'file_path' => 'required|string',
+            'file' => 'required|file|mimes:jpg,jpeg,png,bmp,tiff|max:10240', // max 10MB
         ]);
 
         
-        $ctScan = CtScan::create([
-            'doctor_id' => $request->input('doctor_id'),
-            'patient_id' => $request->input('patient_id'),
-            'file_path' => $request->input('file_path'), 
-        ]);
+        if ($request->hasFile('file')) {
+            $filePath = $request->file('file')->store('ct_scans', 'public');
+
+            
+            $ctScan = CtScan::create([
+                'doctor_id' => $request->input('doctor_id'),
+                'patient_id' => $request->input('patient_id'),
+                'file_path' => $filePath,
+            ]);
+
+           
+            return response()->json($ctScan, 201);
+        }
 
         
-        return response()->json($ctScan, 201);
+        return response()->json(['error' => 'File upload failed'], 500);
     }
 }
