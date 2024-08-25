@@ -32,4 +32,13 @@ class User extends Authenticatable
     {
         return $this->hasMany(AdminLog::class, 'admin_id');
     }
+    public function getJWTIdentifier()
+    {
+        return $this->getKey(); 
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return []; 
+    }
 }
