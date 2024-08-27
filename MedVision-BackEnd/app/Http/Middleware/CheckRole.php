@@ -17,12 +17,11 @@ class CheckRole
      */
     public function handle($request, Closure $next, $role)
     {
-        // Check if the authenticated user has the required role
+        Log::info('CheckRole middleware triggered', ['role' => $role]);
         if (Auth::check() && Auth::user()->role === $role) {
             return $next($request);
         }
 
-        // If the user does not have the required role, return a 403 Forbidden response
         return response()->json(['error' => 'Forbidden'], 403);
     }
 }
