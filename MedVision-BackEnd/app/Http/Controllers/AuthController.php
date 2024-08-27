@@ -17,17 +17,23 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|string|in:doctor,patient',  // Validate the role input
         ]);
-
+    
         $user = User::create([
             'name' => $validatedData['name'],
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
+            'role' => $validatedData['role'],  // Save the role in the user model
         ]);
-
+    
         $token = JWTAuth::fromUser($user);
-
-        return response()->json(['token' => $token], 201);
+    
+        return response()->json([
+            'message' => 'Successfully registered',
+            'token' => $token,
+            'user' => $user
+        ], 201);
     }
 
     // Login a user and return the token
@@ -39,7 +45,11 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        return response()->json(['token' => $token]);
+        return response()->json([
+            'message' => 'Successfully logged in',
+            'token' => $token,
+            'user' => Auth::user()
+        ]);
     }
 
     // Logout a user
@@ -53,6 +63,9 @@ class AuthController extends Controller
     // Get the authenticated user
     public function me()
     {
-        return response()->json(Auth::user());
+        return response()->json([
+            'message' => 'Authenticated user data retrieved successfully',
+            'user' => Auth::user()
+        ]);
     }
 }
