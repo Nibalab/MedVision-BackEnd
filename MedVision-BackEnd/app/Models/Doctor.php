@@ -18,9 +18,14 @@ class Doctor extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function messages()
+    public function sentMessages()
     {
-        return $this->hasMany(Message::class);
+        return $this->morphMany(Message::class, 'sender');
+    }
+
+    public function receivedMessages()
+    {
+        return $this->morphMany(Message::class, 'receiver');
     }
 
     public function ctScans()
@@ -32,6 +37,4 @@ class Doctor extends Model
     {
         return $this->hasMany(Report::class);
     }
-
 }
-
