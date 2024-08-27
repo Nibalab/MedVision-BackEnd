@@ -12,13 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('messages', function (Blueprint $table) {
-            $table->id(); 
-            $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('receiver_id')->constrained('users')->onDelete('cascade');
-            $table->text('message_text'); 
-            $table->string('attachment')->nullable(); 
-            $table->timestamp('read_at')->nullable(); 
+            $table->id();
+            $table->unsignedBigInteger('sender_id');
+            $table->string('sender_type');
+            $table->unsignedBigInteger('receiver_id');
+            $table->string('receiver_type');
+            $table->text('message_text');
+            $table->string('attachment')->nullable();
+            $table->timestamp('read_at')->nullable();
             $table->timestamps();
+        
+            $table->index(['sender_id', 'sender_type']);
+            $table->index(['receiver_id', 'receiver_type']);
         });
     }
 
