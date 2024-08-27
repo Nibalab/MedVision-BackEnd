@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             AppointmentSeeder::class,
             MessageSeeder::class,
             AdminLogSeeder::class,
+            DoctorSeeder::class,
         ]);
     }
 }
