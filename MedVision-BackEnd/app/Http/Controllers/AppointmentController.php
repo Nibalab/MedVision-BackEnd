@@ -3,20 +3,21 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Appointment;
 
 class AppointmentController extends Controller
 {
     public function index()
     {
-        $appointments = Appointment::all();
+        $appointments = Appointment::with(['patient', 'doctor'])->get(); // Eager loading patient and doctor relationships
         return response()->json($appointments);
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'patient_id' => 'required|exists:users,id',
-            'doctor_id' => 'required|exists:users,id',
+            'patient_id' => 'required|exists:patients,id', // Validating against the patients table
+            'doctor_id' => 'required|exists:doctors,id',   // Validating against the doctors table
             'appointment_date' => 'required|date',
             'status' => 'required|in:pending,confirmed,completed',
         ]);
@@ -28,7 +29,7 @@ class AppointmentController extends Controller
 
     public function show($id)
     {
-        $appointment = Appointment::findOrFail($id);
+        $appointment = Appointment::with(['patient', 'doctor'])->findOrFail($id); // Eager loading patient and doctor relationships
         return response()->json($appointment);
     }
 
