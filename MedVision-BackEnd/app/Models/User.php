@@ -28,6 +28,10 @@ class User extends Authenticatable implements JWTSubject
     {
         return $query->where('role', 'admin');
     }
+    public function doctor()
+    {
+        return $this->hasOne(Doctor::class);
+    }
 
     /**
      * Get the patient's messages.
