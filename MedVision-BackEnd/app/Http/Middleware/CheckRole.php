@@ -17,7 +17,6 @@ class CheckRole
      */
     public function handle($request, Closure $next, $role)
     {
-        Log::info('CheckRole middleware triggered', ['role' => $role]);
         if (Auth::check() && Auth::user()->role === $role) {
             return $next($request);
         }

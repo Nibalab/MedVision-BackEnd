@@ -13,34 +13,38 @@ class AuthController extends Controller
 {
     // Register a new doctor
     public function registerDoctor(Request $request)
-    {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+{
+    $validatedData = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users',
+        'password' => 'required|string|min:8|confirmed',
+        'specialization' => 'required|string|max:255',
+    ]);
 
-        $user = User::create([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            'password' => Hash::make($validatedData['password']),
-            'role' => 'doctor',  // Automatically assign the doctor role
-        ]);
+    // Create user with doctor role
+    $user = User::create([
+        'name' => $validatedData['name'],
+        'email' => $validatedData['email'],
+        'password' => Hash::make($validatedData['password']),
+        'role' => 'doctor',
+    ]);
 
-        // Create a corresponding doctor entry
-        Doctor::create([
-            'user_id' => $user->id,
-            // Add other doctor-specific fields here if needed
-        ]);
+    // Create doctor profile
+    $doctor = Doctor::create([
+        'user_id' => $user->id,
+        'specialization' => $validatedData['specialization'],
+        // add other fields as necessary
+    ]);
 
-        $token = JWTAuth::fromUser($user);
+    $token = JWTAuth::fromUser($user);
 
-        return response()->json([
-            'message' => 'Successfully registered as a doctor',
-            'token' => $token,
-            'user' => $user
-        ], 201);
-    }
+    return response()->json([
+        'message' => 'Doctor registered successfully',
+        'token' => $token,
+        'user' => $user,
+        'doctor' => $doctor,
+    ], 201);
+}
 
     // Register a new patient
     public function registerPatient(Request $request)
