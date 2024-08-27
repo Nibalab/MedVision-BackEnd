@@ -13,7 +13,7 @@ class DoctorFactory extends Factory
     public function definition()
     {
         return [
-            'user_id' => User::factory(), // Assumes a User factory exists
+            'user_id' => User::factory(), 
             'specialization' => $this->faker->randomElement(['Cardiology', 'Neurology', 'Orthopedics']),
             'bio' => $this->faker->paragraph,
             'contact_number' => $this->faker->phoneNumber,
