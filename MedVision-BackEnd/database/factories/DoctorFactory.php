@@ -2,22 +2,23 @@
 
 namespace Database\Factories;
 
+use App\Models\Doctor;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Doctor>
- */
 class DoctorFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-    public function definition(): array
+    protected $model = Doctor::class;
+
+    public function definition()
     {
         return [
-            //
+            'user_id' => User::factory(), // Assumes a User factory exists
+            'specialization' => $this->faker->randomElement(['Cardiology', 'Neurology', 'Orthopedics']),
+            'bio' => $this->faker->paragraph,
+            'contact_number' => $this->faker->phoneNumber,
+            'address' => $this->faker->address,
         ];
     }
 }
+
