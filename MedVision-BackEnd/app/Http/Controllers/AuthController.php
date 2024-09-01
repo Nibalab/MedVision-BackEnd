@@ -33,7 +33,7 @@ class AuthController extends Controller
     $doctor = Doctor::create([
         'user_id' => $user->id,
         'specialization' => $validatedData['specialization'],
-        // add other fields as necessary
+       
     ]);
 
     $token = JWTAuth::fromUser($user);
