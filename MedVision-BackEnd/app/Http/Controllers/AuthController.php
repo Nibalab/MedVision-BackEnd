@@ -82,19 +82,22 @@ class AuthController extends Controller
     // Login a user and return the token
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
-
-        if (!$token = JWTAuth::attempt($credentials)) {
+        $request->validate([
+            'email' => 'required|string|email|max:255',
+            'password' => 'required|string|min:8',
+        ]);
+    
+        if (!$token = JWTAuth::attempt($credentials = $request->only('email', 'password'))) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
         return response()->json([
             'message' => 'Successfully logged in',
             'token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth()->factory()->getTTL() * 120, 
             'user' => Auth::user(),
         ]);
     }
-
     // Logout a user
     public function logout(Request $request)
     {
