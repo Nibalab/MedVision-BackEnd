@@ -138,4 +138,21 @@ class DoctorController extends Controller
 
         return response()->json($reports);
     }
+    public function getDashboardStats()
+    {
+        $doctorId = Auth::user()->doctor->id;
+    
+        $totalCtScans = CtScan::where('doctor_id', $doctorId)->count();
+        $totalPatients = Patient::where('doctor_id', $doctorId)->count();
+        $totalAppointmentsToday = Appointment::where('doctor_id', $doctorId)
+            ->whereDate('appointment_date', now()->format('Y-m-d'))
+            ->count();
+    
+        return response()->json([
+            'totalCtScans' => $totalCtScans,
+            'totalPatients' => $totalPatients,
+            'totalAppointmentsToday' => $totalAppointmentsToday,
+        ]);
+    }
+
 }
