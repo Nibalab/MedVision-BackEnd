@@ -13,38 +13,41 @@ class AuthController extends Controller
 {
     // Register a new doctor
     public function registerDoctor(Request $request)
-{
-    $validatedData = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users',
-        'password' => 'required|string|min:8|confirmed',
-        'specialization' => 'required|string|max:255',
-    ]);
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'specialization' => 'required|string|max:255',
+        ]);
 
-    // Create user with doctor role
-    $user = User::create([
-        'name' => $validatedData['name'],
-        'email' => $validatedData['email'],
-        'password' => Hash::make($validatedData['password']),
-        'role' => 'doctor',
-    ]);
+        try {
+            // Create user with doctor role
+            $user = User::create([
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'password' => Hash::make($validatedData['password']),
+                'role' => 'doctor',
+            ]);
 
-    // Create doctor profile
-    $doctor = Doctor::create([
-        'user_id' => $user->id,
-        'specialization' => $validatedData['specialization'],
-       
-    ]);
+            // Create doctor profile
+            $doctor = Doctor::create([
+                'user_id' => $user->id,
+                'specialization' => $validatedData['specialization'],
+            ]);
 
-    $token = JWTAuth::fromUser($user);
+            $token = JWTAuth::fromUser($user);
 
-    return response()->json([
-        'message' => 'Doctor registered successfully',
-        'token' => $token,
-        'user' => $user,
-        'doctor' => $doctor,
-    ], 201);
-}
+            return response()->json([
+                'message' => 'Doctor registered successfully',
+                'token' => $token,
+                'user' => $user,
+                'doctor' => $doctor,
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Registration failed, please try again.'], 500);
+        }
+    }
 
     // Register a new patient
     public function registerPatient(Request $request)
@@ -53,22 +56,27 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'gender' => 'required|string|in:male,female',
         ]);
 
-        $user = User::create([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            'password' => Hash::make($validatedData['password']),
-            'role' => 'patient',  // Automatically assign the patient role
-        ]);
+        try {
+            $user = User::create([
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'password' => Hash::make($validatedData['password']),
+                'role' => 'patient',  // Automatically assign the patient role
+            ]);
 
-        $token = JWTAuth::fromUser($user);
+            $token = JWTAuth::fromUser($user);
 
-        return response()->json([
-            'message' => 'Successfully registered as a patient',
-            'token' => $token,
-            'user' => $user
-        ], 201);
+            return response()->json([
+                'message' => 'Successfully registered as a patient',
+                'token' => $token,
+                'user' => $user,
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Registration failed, please try again.'], 500);
+        }
     }
 
     // Login a user and return the token
@@ -83,16 +91,23 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Successfully logged in',
             'token' => $token,
-            'user' => Auth::user()
+            'user' => Auth::user(),
         ]);
     }
 
     // Logout a user
-    public function logout()
+    public function logout(Request $request)
     {
-        Auth::logout();
+        try {
+            $token = $request->header('Authorization');
+            if ($token) {
+                JWTAuth::invalidate($token);
+            }
 
-        return response()->json(['message' => 'Successfully logged out']);
+            return response()->json(['message' => 'Successfully logged out']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to logout, please try again.'], 500);
+        }
     }
 
     // Get the authenticated user
@@ -100,7 +115,7 @@ class AuthController extends Controller
     {
         return response()->json([
             'message' => 'Authenticated user data retrieved successfully',
-            'user' => Auth::user()
+            'user' => Auth::user(),
         ]);
     }
 }
