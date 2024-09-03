@@ -33,6 +33,12 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(Doctor::class);
     }
 
+    public function scopeDoctors($query)
+{
+    return $query->where('role', 'doctor');
+}
+
+
     /**
      * Get the patient's messages.
      */

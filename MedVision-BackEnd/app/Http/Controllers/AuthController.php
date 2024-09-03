@@ -19,8 +19,9 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'specialization' => 'required|string|max:255',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validate the profile picture
         ]);
-
+    
         try {
             // Create user with doctor role
             $user = User::create([
@@ -29,15 +30,22 @@ class AuthController extends Controller
                 'password' => Hash::make($validatedData['password']),
                 'role' => 'doctor',
             ]);
-
+    
+            // Handle the profile picture upload
+            if ($request->hasFile('profile_picture')) {
+                $path = $request->file('profile_picture')->store('public/profile_pictures');
+                $user->profile_picture = $path;
+                $user->save(); // Save the user with the profile picture path
+            }
+    
             // Create doctor profile
             $doctor = Doctor::create([
                 'user_id' => $user->id,
                 'specialization' => $validatedData['specialization'],
             ]);
-
+    
             $token = JWTAuth::fromUser($user);
-
+    
             return response()->json([
                 'message' => 'Doctor registered successfully',
                 'token' => $token,
@@ -48,7 +56,6 @@ class AuthController extends Controller
             return response()->json(['error' => 'Registration failed, please try again.'], 500);
         }
     }
-
     // Register a new patient
     public function registerPatient(Request $request)
     {
