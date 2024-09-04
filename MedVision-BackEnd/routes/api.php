@@ -11,6 +11,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\AdminLogController;
+use App\Http\Controllers\DoctorController;
 
 // Separate registration routes for doctor and patient
 Route::post('/register/doctor', [AuthController::class, 'registerDoctor']);
@@ -35,7 +36,7 @@ Route::middleware(['auth:api', 'role:admin'])->group(function () {
 // Doctor routes
 Route::middleware(['auth:api', 'role:doctor'])->group(function () {
     Route::get('/doctor-dashboard', [DoctorController::class, 'dashboard']);
-    Route::get('/doctor-dashboard/stats', [DoctorController::class, 'getStats']);
+    Route::get('/doctor-dashboard/stats', [DoctorController::class, 'getDashboardStats']);
     Route::post('ct-scans', [CtScanController::class, 'store']);
     Route::delete('ct-scans/{id}', [CtScanController::class, 'destroy']);
     

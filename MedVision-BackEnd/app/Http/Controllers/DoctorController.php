@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Doctor;
 use Illuminate\Http\Request;
+use App\Models\CtScan;
+use App\Models\User;
+use App\Models\Appointment;
+use Illuminate\Support\Facades\Auth;
 
 class DoctorController extends Controller
 {
@@ -139,20 +143,51 @@ class DoctorController extends Controller
         return response()->json($reports);
     }
     public function getDashboardStats()
-    {
+{
+    try {
+        // Get the current authenticated doctor's ID
         $doctorId = Auth::user()->doctor->id;
-    
+
+        // Count of total CT Scans for this doctor
         $totalCtScans = CtScan::where('doctor_id', $doctorId)->count();
-        $totalPatients = Patient::where('doctor_id', $doctorId)->count();
-        $totalAppointmentsToday = Appointment::where('doctor_id', $doctorId)
-            ->whereDate('appointment_date', now()->format('Y-m-d'))
+
+        // Count of total patients (all patients in the system)
+        $totalPatients = User::where('role', 'patient')->count();
+
+        // Count of new patients (registered within the last week)
+        $newPatients = User::where('role', 'patient')
+            ->where('created_at', '>=', now()->subWeek())
             ->count();
-    
+
+        // Count of old patients (registered more than a week ago)
+        $oldPatients = User::where('role', 'patient')
+            ->where('created_at', '<', now()->subWeek())
+            ->count();
+
+        // Fetch today's appointments for the current doctor
+        $appointmentsToday = Appointment::with('patient')
+            ->where('doctor_id', $doctorId)
+            ->whereDate('appointment_date', now()->format('Y-m-d'))
+            ->get();
+
+        // Count of today's appointments
+        $totalAppointmentsToday = $appointmentsToday->count();
+
+        // Return all stats including today's appointments
         return response()->json([
             'totalCtScans' => $totalCtScans,
             'totalPatients' => $totalPatients,
+            'newPatients' => $newPatients,
+            'oldPatients' => $oldPatients,
             'totalAppointmentsToday' => $totalAppointmentsToday,
+            'appointmentsToday' => $appointmentsToday, // List of today's appointments
         ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'An error occurred while fetching the dashboard stats',
+            'error' => $e->getMessage(),
+        ], 500);
     }
+}
 
 }

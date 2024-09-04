@@ -15,9 +15,9 @@ class AppointmentFactory extends Factory
         return [
             'patient_id' => User::factory()->create(['role' => 'patient'])->id,
             'doctor_id' => User::factory()->create(['role' => 'doctor'])->id,
-            'appointment_date' => $this->faker->dateTimeBetween('+1 week', '+1 month'),
-            'status' => $this->faker->randomElement(['pending', 'confirmed', 'completed']),
+            'appointment_date' => $this->faker->dateTimeBetween('+1 week', '+1 month')->format('Y-m-d'),
+            'appointment_time' => $this->faker->time('H:i:s'), // Adding the time for appointment
+            'status' => $this->faker->randomElement(['pending', 'confirmed', 'completed', 'canceled']),
         ];
     }
 }
-

@@ -28,19 +28,33 @@ class User extends Authenticatable implements JWTSubject
     {
         return $query->where('role', 'admin');
     }
+
+    /**
+     * Scope a query to only include doctors.
+     */
+    public function scopeDoctors($query)
+    {
+        return $query->where('role', 'doctor');
+    }
+
+    /**
+     * Relationship to the Doctor model (if the user is a doctor).
+     */
     public function doctor()
     {
         return $this->hasOne(Doctor::class);
     }
 
-    public function scopeDoctors($query)
-{
-    return $query->where('role', 'doctor');
-}
-
+    /**
+     * Get the patient's appointments.
+     */
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class, 'patient_id');
+    }
 
     /**
-     * Get the patient's messages.
+     * Get the patient's sent messages.
      */
     public function sentMessages()
     {
@@ -64,7 +78,7 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
-     * JWT Methods
+     * JWT Methods for authentication.
      */
     public function getJWTIdentifier()
     {
