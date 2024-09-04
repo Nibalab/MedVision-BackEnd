@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Appointment;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class AppointmentController extends Controller
 {
@@ -15,7 +16,7 @@ class AppointmentController extends Controller
         return response()->json($appointments);
     }
 
-    // Create a new appointment
+    // Create a new appointment request
     public function store(Request $request)
     {
         $request->validate([
@@ -23,16 +24,15 @@ class AppointmentController extends Controller
             'doctor_id' => 'required|exists:users,id',   // Validating against the users table for doctors
             'appointment_date' => 'required|date',
             'appointment_time' => 'required|date_format:H:i', // Validate time format
-            'status' => 'required|in:pending,confirmed,completed,canceled',
         ]);
 
-        // Create the appointment
+        // Create a pending appointment request
         $appointment = Appointment::create([
             'patient_id' => $request->input('patient_id'),
             'doctor_id' => $request->input('doctor_id'),
             'appointment_date' => $request->input('appointment_date'),
             'appointment_time' => $request->input('appointment_time'),
-            'status' => $request->input('status'),
+            'status' => 'pending', // Set default status to pending for new requests
         ]);
 
         return response()->json($appointment, 201);
@@ -49,8 +49,6 @@ class AppointmentController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'patient_id' => 'sometimes|required|exists:users,id', // Ensure the patient exists
-            'doctor_id' => 'sometimes|required|exists:users,id',   // Ensure the doctor exists
             'appointment_date' => 'sometimes|required|date',
             'appointment_time' => 'sometimes|required|date_format:H:i', // Validate time format
             'status' => 'sometimes|required|in:pending,confirmed,completed,canceled',
@@ -62,12 +60,40 @@ class AppointmentController extends Controller
         return response()->json($appointment);
     }
 
+    // Accept an appointment request
+    public function acceptAppointment($id)
+    {
+        $appointment = Appointment::findOrFail($id);
+
+        // Only allow the doctor to accept the appointment if it's pending
+        if ($appointment->status === 'pending') {
+            $appointment->update(['status' => 'confirmed']);
+            return response()->json(['message' => 'Appointment confirmed successfully']);
+        }
+
+        return response()->json(['message' => 'Appointment cannot be confirmed'], 400);
+    }
+
+    // Decline an appointment request
+    public function declineAppointment($id)
+    {
+        $appointment = Appointment::findOrFail($id);
+
+        // Only allow the doctor to decline the appointment if it's pending
+        if ($appointment->status === 'pending') {
+            $appointment->update(['status' => 'canceled']);
+            return response()->json(['message' => 'Appointment declined successfully']);
+        }
+
+        return response()->json(['message' => 'Appointment cannot be declined'], 400);
+    }
+
     // Delete an appointment
     public function destroy($id)
     {
         $appointment = Appointment::findOrFail($id);
         $appointment->delete();
-        
+
         return response()->json(['message' => 'Appointment deleted successfully'], 200);
     }
 }
