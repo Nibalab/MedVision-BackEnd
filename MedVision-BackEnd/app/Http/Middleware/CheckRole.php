@@ -16,11 +16,15 @@ class CheckRole
      * @return mixed
      */
     public function handle($request, Closure $next, $role)
-    {
-        if (Auth::check() && Auth::user()->role === $role) {
-            return $next($request);
-        }
+{
+    $user = Auth::user();
+    dd($user);
 
-        return response()->json(['error' => 'Forbidden'], 403);
+    if (Auth::check() && $user->role === $role) {
+        return $next($request);
     }
+
+    return response()->json(['error' => 'Forbidden'], 403);
+}
+
 }

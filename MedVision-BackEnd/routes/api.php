@@ -34,9 +34,16 @@ Route::middleware(['auth:api', 'role:admin'])->group(function () {
 });
 
 // Doctor routes
-Route::middleware(['auth:api', 'role:doctor'])->group(function () {
+Route::middleware(['auth:api'])->group(function () {
     Route::get('/doctor-dashboard', [DoctorController::class, 'dashboard']);
     Route::get('/doctor-dashboard/stats', [DoctorController::class, 'getDashboardStats']);
+    
+    // Appointment management by doctor
+    Route::get('/doctor-dashboard/pending-appointments', [DoctorController::class, 'getPendingAppointments']);
+    Route::put('appointments/{id}/accept', [AppointmentController::class, 'acceptAppointment']);  // Doctor accepts the appointment
+    Route::put('appointments/{id}/decline', [AppointmentController::class, 'declineAppointment']); // Doctor declines the appointment
+    
+    // CT Scan and 3D Model Management
     Route::post('ct-scans', [CtScanController::class, 'store']);
     Route::delete('ct-scans/{id}', [CtScanController::class, 'destroy']);
     
@@ -52,8 +59,14 @@ Route::middleware(['auth:api', 'role:doctor'])->group(function () {
     Route::put('reports/{id}', [ReportController::class, 'update']);
 });
 
-// Common routes for authenticated users
-Route::middleware(['auth:api'])->group(function () {
+// Patient routes (common user routes)
+Route::middleware(['auth:api', 'role:patient'])->group(function () {
+    // Appointment management by patient
+    Route::post('appointments', [AppointmentController::class, 'store']); // Patient requests an appointment
+    Route::put('appointments/{id}', [AppointmentController::class, 'update']); // Patient can update an appointment request
+    Route::get('appointments', [AppointmentController::class, 'index']); // View appointments
+    Route::get('appointments/{id}', [AppointmentController::class, 'show']); // View specific appointment
+    
     Route::get('ct-scans', [CtScanController::class, 'index']);
     Route::get('ct-scans/{id}', [CtScanController::class, 'show']);
     
@@ -62,13 +75,10 @@ Route::middleware(['auth:api'])->group(function () {
     
     Route::get('reports', [ReportController::class, 'index']);
     Route::get('reports/{id}', [ReportController::class, 'show']);
-    
-    Route::get('appointments', [AppointmentController::class, 'index']);
-    Route::get('appointments/{id}', [AppointmentController::class, 'show']);
-    Route::post('appointments', [AppointmentController::class, 'store']);
-    Route::put('appointments/{id}', [AppointmentController::class, 'update']);
-    Route::delete('appointments/{id}', [AppointmentController::class, 'destroy']);
-    
+});
+
+// Common routes for authenticated users (e.g. both patients and doctors)
+Route::middleware(['auth:api'])->group(function () {
     Route::get('messages', [MessageController::class, 'index']);
     Route::get('messages/{id}', [MessageController::class, 'show']);
     Route::post('messages', [MessageController::class, 'store']);

@@ -64,28 +64,17 @@ class AppointmentController extends Controller
     public function acceptAppointment($id)
     {
         $appointment = Appointment::findOrFail($id);
-
-        // Only allow the doctor to accept the appointment if it's pending
-        if ($appointment->status === 'pending') {
-            $appointment->update(['status' => 'confirmed']);
-            return response()->json(['message' => 'Appointment confirmed successfully']);
-        }
-
-        return response()->json(['message' => 'Appointment cannot be confirmed'], 400);
+        $appointment->update(['status' => 'confirmed']);
+        
+        return response()->json(['message' => 'Appointment accepted successfully', 'appointment' => $appointment]);
     }
-
-    // Decline an appointment request
+    
     public function declineAppointment($id)
     {
         $appointment = Appointment::findOrFail($id);
-
-        // Only allow the doctor to decline the appointment if it's pending
-        if ($appointment->status === 'pending') {
-            $appointment->update(['status' => 'canceled']);
-            return response()->json(['message' => 'Appointment declined successfully']);
-        }
-
-        return response()->json(['message' => 'Appointment cannot be declined'], 400);
+        $appointment->update(['status' => 'canceled']);
+        
+        return response()->json(['message' => 'Appointment declined successfully', 'appointment' => $appointment]);
     }
 
     // Delete an appointment

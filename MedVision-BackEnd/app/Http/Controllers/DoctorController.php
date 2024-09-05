@@ -142,52 +142,83 @@ class DoctorController extends Controller
 
         return response()->json($reports);
     }
+
+    /**
+     * Get doctor dashboard stats including CT scans, patients, and today's appointments.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function getDashboardStats()
-{
-    try {
-        // Get the current authenticated doctor's ID
-        $doctorId = Auth::user()->doctor->id;
+    {
+        try {
+            // Get the current authenticated doctor's ID
+            $doctorId = Auth::user()->doctor->id;
 
-        // Count of total CT Scans for this doctor
-        $totalCtScans = CtScan::where('doctor_id', $doctorId)->count();
+            // Count of total CT Scans for this doctor
+            $totalCtScans = CtScan::where('doctor_id', $doctorId)->count();
 
-        // Count of total patients (all patients in the system)
-        $totalPatients = User::where('role', 'patient')->count();
+            // Count of total patients (all patients in the system)
+            $totalPatients = User::where('role', 'patient')->count();
 
-        // Count of new patients (registered within the last week)
-        $newPatients = User::where('role', 'patient')
-            ->where('created_at', '>=', now()->subWeek())
-            ->count();
+            // Count of new patients (registered within the last week)
+            $newPatients = User::where('role', 'patient')
+                ->where('created_at', '>=', now()->subWeek())
+                ->count();
 
-        // Count of old patients (registered more than a week ago)
-        $oldPatients = User::where('role', 'patient')
-            ->where('created_at', '<', now()->subWeek())
-            ->count();
+            // Count of old patients (registered more than a week ago)
+            $oldPatients = User::where('role', 'patient')
+                ->where('created_at', '<', now()->subWeek())
+                ->count();
 
-        // Fetch today's appointments for the current doctor
-        $appointmentsToday = Appointment::with('patient')
-            ->where('doctor_id', $doctorId)
-            ->whereDate('appointment_date', now()->format('Y-m-d'))
-            ->get();
+            // Fetch today's appointments for the current doctor
+            $appointmentsToday = Appointment::with('patient')
+                ->where('doctor_id', $doctorId)
+                ->whereDate('appointment_date', now()->format('Y-m-d'))
+                ->get();
 
-        // Count of today's appointments
-        $totalAppointmentsToday = $appointmentsToday->count();
+            // Count of today's appointments
+            $totalAppointmentsToday = $appointmentsToday->count();
 
-        // Return all stats including today's appointments
-        return response()->json([
-            'totalCtScans' => $totalCtScans,
-            'totalPatients' => $totalPatients,
-            'newPatients' => $newPatients,
-            'oldPatients' => $oldPatients,
-            'totalAppointmentsToday' => $totalAppointmentsToday,
-            'appointmentsToday' => $appointmentsToday, // List of today's appointments
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => 'An error occurred while fetching the dashboard stats',
-            'error' => $e->getMessage(),
-        ], 500);
+            // Return all stats including today's appointments
+            return response()->json([
+                'totalCtScans' => $totalCtScans,
+                'totalPatients' => $totalPatients,
+                'newPatients' => $newPatients,
+                'oldPatients' => $oldPatients,
+                'totalAppointmentsToday' => $totalAppointmentsToday,
+                'appointmentsToday' => $appointmentsToday, // List of today's appointments
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred while fetching the dashboard stats',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
-}
 
+    /**
+     * Get pending appointment requests for the logged-in doctor.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getPendingAppointments()
+    {
+        try {
+            // Get the authenticated doctor's ID
+            $doctorId = Auth::user()->doctor->id;
+
+            // Fetch pending appointments for this doctor
+            $pendingAppointments = Appointment::with('patient')
+                ->where('doctor_id', $doctorId)
+                ->where('status', 'pending')
+                ->get();
+
+            return response()->json($pendingAppointments);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred while fetching pending appointments',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
