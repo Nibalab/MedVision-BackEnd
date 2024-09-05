@@ -1,6 +1,6 @@
 <?php
 
-// app/Http/Middleware/EnsureUserIsDoctor.php
+
 namespace App\Http\Middleware;
 
 use Closure;
