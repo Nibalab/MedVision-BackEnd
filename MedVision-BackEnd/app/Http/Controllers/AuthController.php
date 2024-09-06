@@ -107,18 +107,33 @@ class AuthController extends Controller
     }
     // Logout a user
     public function logout(Request $request)
-    {
-        try {
-            $token = $request->header('Authorization');
-            if ($token) {
-                JWTAuth::invalidate($token);
-            }
+{
+    try {
+        // Extract the token from the Authorization header
+        $fullToken = $request->header('Authorization');
+
+        // Log the full token for debugging purposes
+        \Log::info('Token: ' . $fullToken);
+
+        // Check if Authorization header exists and contains the Bearer token
+        if ($fullToken && preg_match('/Bearer\s(\S+)/', $fullToken, $matches)) {
+            $token = $matches[1]; // Extract the actual token part (without 'Bearer')
+
+            // Invalidate the token
+            JWTAuth::setToken($token)->invalidate();
 
             return response()->json(['message' => 'Successfully logged out']);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to logout, please try again.'], 500);
         }
+
+        return response()->json(['error' => 'Failed to logout, no token found.'], 400);
+    } catch (\Exception $e) {
+        \Log::error('Logout failed: ' . $e->getMessage());  // Log the error for further debugging
+        return response()->json(['error' => 'Failed to logout, please try again.'], 500);
     }
+}
+
+
+
 
     // Get the authenticated user
     public function me()

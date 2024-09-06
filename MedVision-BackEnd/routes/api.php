@@ -13,7 +13,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\AdminLogController;
 use App\Http\Controllers\DoctorController;
 
-// Separate registration routes for doctor and patient
+
 Route::post('/register/doctor', [AuthController::class, 'registerDoctor']);
 Route::post('/register/patient', [AuthController::class, 'registerPatient']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -21,7 +21,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api'
 Route::get('/me', [AuthController::class, 'me'])->middleware('auth:api');
 
 // Admin routes
-Route::middleware(['auth:api', 'role:admin'])->group(function () {
+Route::middleware(['auth:api', 'admin'])->group(function () {
     Route::get('users', [UserController::class, 'index']);
     Route::get('users/{id}', [UserController::class, 'show']);
     Route::put('users/{id}', [UserController::class, 'update']);
@@ -42,6 +42,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/doctor-dashboard/pending-appointments', [DoctorController::class, 'getPendingAppointments']);
     Route::put('appointments/{id}/accept', [AppointmentController::class, 'acceptAppointment']);  // Doctor accepts the appointment
     Route::put('appointments/{id}/decline', [AppointmentController::class, 'declineAppointment']); // Doctor declines the appointment
+    Route::get('/appointments/today', [AppointmentController::class, 'getTodayAppointments']);
+    Route::get('/appointments/week', [AppointmentController::class, 'getWeekAppointments']);
     
     // CT Scan and 3D Model Management
     Route::post('ct-scans', [CtScanController::class, 'store']);
@@ -60,7 +62,7 @@ Route::middleware(['auth:api'])->group(function () {
 });
 
 // Patient routes (common user routes)
-Route::middleware(['auth:api', 'role:patient'])->group(function () {
+Route::middleware(['auth:api', 'patient'])->group(function () {
     // Appointment management by patient
     Route::post('appointments', [AppointmentController::class, 'store']); // Patient requests an appointment
     Route::put('appointments/{id}', [AppointmentController::class, 'update']); // Patient can update an appointment request

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Carbon\Carbon;
 
 use Illuminate\Http\Request;
 use App\Models\Appointment;
@@ -84,5 +85,43 @@ class AppointmentController extends Controller
         $appointment->delete();
 
         return response()->json(['message' => 'Appointment deleted successfully'], 200);
+    }
+
+    public function getTodayAppointments()
+    {
+        $doctorId = Auth::user()->doctor->id; // Assuming user is logged in as a doctor
+        
+        // Get today's date
+        $today = Carbon::now()->format('Y-m-d');
+
+        // Fetch today's appointments for the authenticated doctor
+        $appointments = Appointment::where('doctor_id', $doctorId)
+            ->whereDate('appointment_date', $today)
+            ->where('status', 'confirmed') // Optional: if you only want confirmed appointments
+            ->get();
+
+        return response()->json($appointments);
+    }
+
+    /**
+     * Fetch this week's appointments for the authenticated doctor.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getWeekAppointments()
+    {
+        $doctorId = Auth::user()->doctor->id; // Assuming user is logged in as a doctor
+
+        // Get the current week's start and end dates
+        $startOfWeek = Carbon::now()->startOfWeek()->format('Y-m-d');
+        $endOfWeek = Carbon::now()->endOfWeek()->format('Y-m-d');
+
+        // Fetch this week's appointments for the authenticated doctor
+        $appointments = Appointment::where('doctor_id', $doctorId)
+            ->whereBetween('appointment_date', [$startOfWeek, $endOfWeek])
+            ->where('status', 'confirmed') // Optional: if you only want confirmed appointments
+            ->get();
+
+        return response()->json($appointments);
     }
 }
