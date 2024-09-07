@@ -12,6 +12,7 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\AdminLogController;
 use App\Http\Controllers\DoctorController;
+use App\Http\Middleware\EnsureUserIsDoctor;
 
 
 Route::post('/register/doctor', [AuthController::class, 'registerDoctor']);
@@ -34,7 +35,7 @@ Route::middleware(['auth:api', 'admin'])->group(function () {
 });
 
 // Doctor routes
-Route::middleware(['auth:api'])->group(function () {
+Route::middleware(['auth:api', EnsureUserIsDoctor::class])->group(function () {
     Route::get('/doctor-dashboard', [DoctorController::class, 'dashboard']);
     Route::get('/doctor-dashboard/stats', [DoctorController::class, 'getDashboardStats']);
     

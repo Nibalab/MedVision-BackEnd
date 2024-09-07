@@ -10,7 +10,7 @@ class EnsureUserIsDoctor
 {
     public function handle($request, Closure $next)
     {
-        dd(Auth::user());
+       
         if (Auth::check() && Auth::user()->role === 'doctor') {
             return $next($request);
         }
