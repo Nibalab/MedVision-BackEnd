@@ -32,6 +32,7 @@ class MessageController extends Controller
             'receiver_id' => $request->input('receiver_id'),
             'message_text' => $request->input('message_text'),
             'attachment' => $attachmentPath,
+            'is_read' => false,
         ]);
 
         return response()->json($message, 201);
@@ -45,7 +46,7 @@ class MessageController extends Controller
             'receiver_type' => 'required|string|in:user,doctor',
             'receiver_id' => 'required|integer',
         ]);
-
+    
         $messages = Message::where(function ($query) use ($request) {
             $query->where('sender_type', $request->input('sender_type') === 'user' ? \App\Models\User::class : \App\Models\Doctor::class)
                   ->where('sender_id', $request->sender_id)
@@ -56,14 +57,26 @@ class MessageController extends Controller
                   ->where('sender_id', $request->receiver_id)
                   ->where('receiver_type', $request->input('sender_type') === 'user' ? \App\Models\User::class : \App\Models\Doctor::class)
                   ->where('receiver_id', $request->sender_id);
-        })->orderBy('created_at', 'asc')->get();
-
-        return response()->json($messages);
+        })
+        ->orderBy('created_at', 'asc')
+        ->get();
+    
+        $unreadCount = Message::where('receiver_id', $request->receiver_id)
+                            ->where('is_read', false)
+                            ->count();
+    
+        return response()->json([
+            'messages' => $messages,
+            'unread_count' => $unreadCount
+        ]);
     }
 
     public function show($id)
     {
         $message = Message::findOrFail($id);
+        if ($message->attachment) {
+            $message->attachment_url = asset('storage/' . $message->attachment);
+        }
         return response()->json($message);
     }
 
@@ -83,7 +96,10 @@ class MessageController extends Controller
     public function markAsRead($id)
     {
         $message = Message::findOrFail($id);
-        $message->update(['read_at' => now()]);
+        $message->update([
+            'read_at' => now(),
+            'is_read' => true
+        ]);
 
         return response()->json($message);
     }
