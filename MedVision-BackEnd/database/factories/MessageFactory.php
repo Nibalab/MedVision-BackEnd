@@ -16,8 +16,9 @@ class MessageFactory extends Factory
             'sender_id' => User::factory()->create(['role' => 'doctor'])->id,
             'receiver_id' => User::factory()->create(['role' => 'patient'])->id,
             'message_text' => $this->faker->sentence,
-            'attachment' => $this->faker->filePath(),
+            'attachment' => $this->faker->optional()->filePath(),
             'read_at' => $this->faker->optional()->dateTimeBetween('-1 week', 'now'),
+            'is_read' => $this->faker->boolean(), // Add is_read field with random true/false
         ];
     }
 }
