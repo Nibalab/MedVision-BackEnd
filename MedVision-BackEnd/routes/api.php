@@ -87,4 +87,6 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('messages', [MessageController::class, 'store']);
     Route::put('messages/{id}/read', [MessageController::class, 'markAsRead']);
     Route::delete('messages/{id}', [MessageController::class, 'destroy']);
+    Route::get('/search', [UserController::class, 'search']);
+
 });

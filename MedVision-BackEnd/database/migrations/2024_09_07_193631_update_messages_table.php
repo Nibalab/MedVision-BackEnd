@@ -13,7 +13,14 @@ return new class extends Migration
     {
         Schema::table('messages', function (Blueprint $table) {
             $table->boolean('is_read')->default(false);
-            
+        
+
+        if (!Schema::hasColumn('messages', 'sender_type')) {
+                $table->string('sender_type');
+            }
+        if (!Schema::hasColumn('messages', 'receiver_type')) {
+                $table->string('receiver_type');
+            }    
         
         });
     }
@@ -25,6 +32,12 @@ return new class extends Migration
     {
         Schema::table('messages', function (Blueprint $table) {
             $table->dropColumn('is_read');
+            if (Schema::hasColumn('messages', 'sender_type')) {
+                $table->dropColumn('sender_type');
+            }
+            if (Schema::hasColumn('messages', 'receiver_type')) {
+                $table->dropColumn('receiver_type');
+            }
         });
     }
 };

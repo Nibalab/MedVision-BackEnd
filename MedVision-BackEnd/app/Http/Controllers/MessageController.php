@@ -39,37 +39,46 @@ class MessageController extends Controller
     }
 
     public function index(Request $request)
-    {
-        $request->validate([
-            'sender_type' => 'required|string|in:user,doctor',
-            'sender_id' => 'required|integer',
-            'receiver_type' => 'required|string|in:user,doctor',
-            'receiver_id' => 'required|integer',
-        ]);
-    
-        $messages = Message::where(function ($query) use ($request) {
-            $query->where('sender_type', $request->input('sender_type') === 'user' ? \App\Models\User::class : \App\Models\Doctor::class)
-                  ->where('sender_id', $request->sender_id)
-                  ->where('receiver_type', $request->input('receiver_type') === 'user' ? \App\Models\User::class : \App\Models\Doctor::class)
-                  ->where('receiver_id', $request->receiver_id);
-        })->orWhere(function ($query) use ($request) {
-            $query->where('sender_type', $request->input('receiver_type') === 'user' ? \App\Models\User::class : \App\Models\Doctor::class)
-                  ->where('sender_id', $request->receiver_id)
-                  ->where('receiver_type', $request->input('sender_type') === 'user' ? \App\Models\User::class : \App\Models\Doctor::class)
-                  ->where('receiver_id', $request->sender_id);
-        })
-        ->orderBy('created_at', 'asc')
+{
+    $authUser = auth()->user();
+
+    // Fetch messages where the doctor is the receiver
+    $messages = Message::where('receiver_id', $authUser->id)
+        ->where('receiver_type', \App\Models\Doctor::class)
+        ->with('sender')  // Load sender relationship to get user names
+        ->orderBy('created_at', 'desc') // Order by latest message
         ->get();
+
+    // Prepare response
+    $messagesWithSenderInfo = $messages->map(function ($message) {
+        return [
+            'id' => $message->id,
+            'message_text' => $message->message_text,
+            'is_read' => $message->is_read,
+            'sender_id' => $message->sender_id,  // Include sender_id here
+            'sender_type' => get_class($message->sender),  // Add sender_type (User or Doctor)
+            'sender_name' => $message->sender->name ?? 'Unknown Sender',
+            'sender_profile_picture' => $message->sender->profile_picture ?? null,
+            'created_at' => $message->created_at,
+        ];
+    });
+
+    // Count unread messages
+    $unreadCount = Message::where('receiver_id', $authUser->id)
+        ->where('receiver_type', \App\Models\Doctor::class)
+        ->where('is_read', false)
+        ->count();
+
+    return response()->json([
+        'messages' => $messagesWithSenderInfo,
+        'unread_count' => $unreadCount,
+    ]);
+}
+
     
-        $unreadCount = Message::where('receiver_id', $request->receiver_id)
-                            ->where('is_read', false)
-                            ->count();
+
     
-        return response()->json([
-            'messages' => $messages,
-            'unread_count' => $unreadCount
-        ]);
-    }
+    
 
     public function show($id)
     {
