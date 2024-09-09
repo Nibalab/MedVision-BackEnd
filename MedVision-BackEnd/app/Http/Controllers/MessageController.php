@@ -97,25 +97,18 @@ class MessageController extends Controller
     }
 
     public function markAsRead($id)
-    {
-        // Fetch the authenticated user
-        $authUser = auth()->user();
-    
-        // Find the message by ID
-        $message = Message::findOrFail($id);
-    
-        // Check if the authenticated user is the sender of the message
-        if ($message->sender_id !== $authUser->id) {
-            return response()->json(['error' => 'You are not authorized to mark this message as read'], 403);
-        }
-    
-        // Update the message as read
-        $message->update([
-            'read_at' => now(),
-            'is_read' => true
-        ]);
-    
-        return response()->json(['message' => 'Message marked as read successfully']);
+{
+    $message = Message::findOrFail($id);
+
+    // If the message is not read, update it
+    if (!$message->is_read) {
+        $message->is_read = true;
+        $message->read_at = now();
+        $message->save();
     }
+
+    return response()->json(['status' => 'success', 'message' => 'Message marked as read']);
+}
+
     
 }
