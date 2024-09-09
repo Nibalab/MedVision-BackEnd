@@ -39,45 +39,39 @@ class MessageController extends Controller
     }
 
     public function index(Request $request)
-{
-    $authUser = auth()->user();
-
-    // Fetch messages where the doctor is the receiver
-    $messages = Message::where('receiver_id', $authUser->id)
-        ->where('receiver_type', \App\Models\Doctor::class)
-        ->with('sender')  // Load sender relationship to get user names
-        ->orderBy('created_at', 'desc') // Order by latest message
-        ->get();
-
-    // Prepare response
-    $messagesWithSenderInfo = $messages->map(function ($message) {
-        return [
-            'id' => $message->id,
-            'message_text' => $message->message_text,
-            'is_read' => $message->is_read,
-            'sender_id' => $message->sender_id,  // Include sender_id here
-            'sender_type' => get_class($message->sender),  // Add sender_type (User or Doctor)
-            'sender_name' => $message->sender->name ?? 'Unknown Sender',
-            'sender_profile_picture' => $message->sender->profile_picture ?? null,
-            'created_at' => $message->created_at,
-        ];
-    });
-
-    // Count unread messages
-    $unreadCount = Message::where('receiver_id', $authUser->id)
-        ->where('receiver_type', \App\Models\Doctor::class)
-        ->where('is_read', false)
-        ->count();
-
-    return response()->json([
-        'messages' => $messagesWithSenderInfo,
-        'unread_count' => $unreadCount,
-    ]);
-}
-
+    {
+        $authUser = auth()->user();
+        $senderId = $request->input('sender_id', null);  // Optional parameter
     
-
+        $messagesQuery = Message::where('receiver_id', $authUser->id)
+            ->where('receiver_type', \App\Models\Doctor::class);
     
+        if ($senderId) {
+            $messagesQuery->where('sender_id', $senderId);
+        }
+    
+        $messages = $messagesQuery->with('sender')  // Load sender relationship to get user names
+            ->orderBy('created_at', 'desc') // Order by latest message
+            ->get();
+    
+        $messagesWithSenderInfo = $messages->map(function ($message) {
+            return [
+                'id' => $message->id,
+                'message_text' => $message->message_text,
+                'is_read' => $message->is_read,
+                'sender_id' => $message->sender_id,
+                'sender_type' => get_class($message->sender),
+                'sender_name' => $message->sender->name ?? 'Unknown Sender',
+                'sender_profile_picture' => $message->sender->profile_picture ?? null,
+                'created_at' => $message->created_at,
+            ];
+        });
+    
+        return response()->json([
+            'messages' => $messagesWithSenderInfo,
+            'unread_count' => $messages->where('is_read', false)->count(),
+        ]);
+    }
     
 
     public function show($id)
@@ -104,12 +98,24 @@ class MessageController extends Controller
 
     public function markAsRead($id)
     {
+        // Fetch the authenticated user
+        $authUser = auth()->user();
+    
+        // Find the message by ID
         $message = Message::findOrFail($id);
+    
+        // Check if the authenticated user is the sender of the message
+        if ($message->sender_id !== $authUser->id) {
+            return response()->json(['error' => 'You are not authorized to mark this message as read'], 403);
+        }
+    
+        // Update the message as read
         $message->update([
             'read_at' => now(),
             'is_read' => true
         ]);
-
-        return response()->json($message);
+    
+        return response()->json(['message' => 'Message marked as read successfully']);
     }
+    
 }
