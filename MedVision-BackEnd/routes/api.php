@@ -14,7 +14,7 @@ use App\Http\Controllers\AdminLogController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Middleware\EnsureUserIsDoctor;
 
-
+// Authentication routes
 Route::post('/register/doctor', [AuthController::class, 'registerDoctor']);
 Route::post('/register/patient', [AuthController::class, 'registerPatient']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -58,8 +58,10 @@ Route::middleware(['auth:api', EnsureUserIsDoctor::class])->group(function () {
     Route::post('annotations', [AnnotationController::class, 'store']);
     Route::delete('annotations/{id}', [AnnotationController::class, 'destroy']);
     
-    Route::post('reports', [ReportController::class, 'store']);
-    Route::put('reports/{id}', [ReportController::class, 'update']);
+    // Report Management (Doctor uploads and manages reports)
+    Route::post('reports', [ReportController::class, 'store']); // Doctor uploads the report
+    Route::put('reports/{id}', [ReportController::class, 'update']); // Update report if needed
+    Route::delete('reports/{id}', [ReportController::class, 'destroy']); // Delete report
 });
 
 // Patient routes (common user routes)
@@ -76,11 +78,13 @@ Route::middleware(['auth:api', 'patient'])->group(function () {
     Route::get('annotations/{modelId}', [AnnotationController::class, 'index']);
     Route::get('annotations/{id}', [AnnotationController::class, 'show']);
     
-    Route::get('reports', [ReportController::class, 'index']);
-    Route::get('reports/{id}', [ReportController::class, 'show']);
+    // Report routes for patients
+    Route::get('reports', [ReportController::class, 'index']); // Patient views their reports
+    Route::get('reports/{id}', [ReportController::class, 'show']); // View a specific report
+    Route::get('reports/download/{id}', [ReportController::class, 'downloadReport']); // Patient downloads the report document
 });
 
-// Common routes for authenticated users (e.g. both patients and doctors)
+// Common routes for authenticated users (e.g., both patients and doctors)
 Route::middleware(['auth:api'])->group(function () {
     Route::get('messages', [MessageController::class, 'index']);
     Route::get('messages/{id}', [MessageController::class, 'show']);
@@ -88,5 +92,4 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('messages/{id}/read', [MessageController::class, 'markAsRead']);
     Route::delete('messages/{id}', [MessageController::class, 'destroy']);
     Route::get('/search', [UserController::class, 'search']);
-
 });
