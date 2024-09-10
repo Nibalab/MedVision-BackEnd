@@ -64,27 +64,44 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'gender' => 'required|string|in:male,female',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validate the profile picture
         ]);
-
+    
         try {
+            // Handle profile picture upload
+            $profilePicturePath = null;
+            if ($request->hasFile('profile_picture')) {
+                // Log the file upload for debugging
+                \Log::info('Patient profile picture upload: ' . $request->file('profile_picture')->getClientOriginalName());
+    
+                // Store the profile picture and log the path
+                $profilePicturePath = $request->file('profile_picture')->store('public/profile_pictures');
+                \Log::info('Stored patient profile picture at: ' . $profilePicturePath);
+            }
+    
+            // Create the patient user
             $user = User::create([
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
                 'password' => Hash::make($validatedData['password']),
                 'role' => 'patient',  // Automatically assign the patient role
+                'gender' => $validatedData['gender'], // Store the gender
+                'profile_picture' => $profilePicturePath, // Store profile picture path if uploaded
             ]);
-
+    
             $token = JWTAuth::fromUser($user);
-
+    
             return response()->json([
                 'message' => 'Successfully registered as a patient',
                 'token' => $token,
                 'user' => $user,
             ], 201);
         } catch (\Exception $e) {
+            \Log::error('Patient registration error: ' . $e->getMessage());
             return response()->json(['error' => 'Registration failed, please try again.'], 500);
         }
     }
+    
 
     // Login a user and return the token
     public function login(Request $request)
