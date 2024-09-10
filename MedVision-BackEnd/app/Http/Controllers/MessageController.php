@@ -42,39 +42,53 @@ class MessageController extends Controller
     }
 
     public function index(Request $request)
-    {
-        $authUser = auth()->user();
-        $senderId = $request->input('sender_id', null);  // Optional parameter
-    
-        $messagesQuery = Message::where('receiver_id', $authUser->id)
-            ->where('receiver_type', \App\Models\Doctor::class);
-    
-        if ($senderId) {
-            $messagesQuery->where('sender_id', $senderId);
-        }
-    
-        $messages = $messagesQuery->with('sender')  // Load sender relationship to get user names
-            ->orderBy('created_at', 'desc') // Order by latest message
-            ->get();
-    
-        $messagesWithSenderInfo = $messages->map(function ($message) {
-            return [
-                'id' => $message->id,
-                'message_text' => $message->message_text,
-                'is_read' => $message->is_read,
-                'sender_id' => $message->sender_id,
-                'sender_type' => get_class($message->sender),
-                'sender_name' => $message->sender->name ?? 'Unknown Sender',
-                'sender_profile_picture' => $message->sender->profile_picture ?? null,
-                'created_at' => $message->created_at,
-            ];
-        });
-    
-        return response()->json([
-            'messages' => $messagesWithSenderInfo,
-            'unread_count' => $messages->where('is_read', false)->count(),
-        ]);
+{
+    $authUser = auth()->user();
+    $senderId = $request->input('sender_id', null);  // Optional parameter
+
+    // Query for both received and sent messages
+    $messagesQuery = Message::where(function ($query) use ($authUser) {
+        // Received messages
+        $query->where('receiver_id', $authUser->id)
+              ->where('receiver_type', \App\Models\Doctor::class);
+    })
+    ->orWhere(function ($query) use ($authUser) {
+        // Sent messages
+        $query->where('sender_id', $authUser->id)
+              ->where('sender_type', \App\Models\Doctor::class);
+    });
+
+    if ($senderId) {
+        $messagesQuery->where('sender_id', $senderId)
+                      ->orWhere('receiver_id', $senderId);
     }
+
+    $messages = $messagesQuery->with('sender')  // Load sender relationship to get user names
+        ->orderBy('created_at', 'desc') // Order by latest message
+        ->get();
+
+    $messagesWithSenderInfo = $messages->map(function ($message) {
+        // Ensure sender is not null before using get_class()
+        $senderClass = $message->sender ? get_class($message->sender) : null;
+
+        return [
+            'id' => $message->id,
+            'message_text' => $message->message_text,
+            'is_read' => $message->is_read,
+            'sender_id' => $message->sender_id,
+            'sender_type' => $senderClass,
+            'sender_name' => $message->sender->name ?? 'Unknown Sender',
+            'sender_profile_picture' => $message->sender->profile_picture ?? null,
+            'created_at' => $message->created_at,
+        ];
+    });
+
+    return response()->json([
+        'messages' => $messagesWithSenderInfo,
+        'unread_count' => $messages->where('is_read', false)->count(),
+    ]);
+}
+
     
 
     public function show($id)
