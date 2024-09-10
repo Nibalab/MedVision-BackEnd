@@ -10,6 +10,7 @@ class MessageController extends Controller
 {
     public function store(Request $request)
     {
+        \Log::info('Request Data:', $request->all());
         $request->validate([
             'sender_type' => 'required|string|in:user,doctor',
             'sender_id' => 'required|integer',
@@ -18,6 +19,7 @@ class MessageController extends Controller
             'message_text' => 'required|string',
             'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:10240', // Max 10MB file
         ]);
+        
 
         $attachmentPath = null;
 
@@ -34,6 +36,7 @@ class MessageController extends Controller
             'attachment' => $attachmentPath,
             'is_read' => false,
         ]);
+        \Log::info('Message created:', ['message' => $message]);
 
         return response()->json($message, 201);
     }
