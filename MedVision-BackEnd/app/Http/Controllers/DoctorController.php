@@ -8,6 +8,7 @@ use App\Models\CtScan;
 use App\Models\User;
 use App\Models\Appointment;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DoctorController extends Controller
 {
@@ -239,13 +240,29 @@ public function showDoctorForPatient($id)
 public function searchDoctors(Request $request)
 {
     $searchTerm = $request->input('name'); // Get the search term from the request
-    $doctors = User::where('role', 'doctor')  // Ensure you are only searching for users with the 'doctor' role
-                ->where('name', 'LIKE', '%' . $searchTerm . '%')  // Match doctors whose name contains the search term
-                ->with('doctor')  // Include the related doctor information
-                ->get();
+
+    // Check if search term exists
+    if (!$searchTerm) {
+        return response()->json(['message' => 'Search term is required'], 400);
+    }
+
+    // Query to search for doctors by the associated user's name
+    $doctors = Doctor::join('users', 'doctors.user_id', '=', 'users.id') // Join doctors with users table
+                    ->where('users.role', 'doctor') // Ensure we're searching for doctors
+                    ->where('users.name', 'LIKE', '%' . $searchTerm . '%') // Search for doctors by user name
+                    ->select('doctors.*', 'users.name', 'users.email', 'users.profile_picture') // Select doctor and user info
+                    ->get();
+
+    // Check if any doctors are found
+    if ($doctors->isEmpty()) {
+        return response()->json(['message' => 'No doctors found for the given search criteria'], 404);
+    }
 
     return response()->json($doctors);
 }
+
+
+
 
 
 }

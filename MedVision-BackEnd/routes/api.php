@@ -65,6 +65,9 @@ Route::middleware(['auth:api', EnsureUserIsDoctor::class])->group(function () {
     Route::delete('reports/{id}', [ReportController::class, 'destroy']); // Delete report
 });
 
+Route::get('/doctors/search', [DoctorController::class, 'searchDoctors']);
+
+
 // Patient routes (common user routes)
 Route::middleware(['auth:api', EnsureUserIsPatient::class])->group(function () {
     // Appointment management by patient
@@ -75,7 +78,7 @@ Route::middleware(['auth:api', EnsureUserIsPatient::class])->group(function () {
 
     // In your routes/api.php file
     Route::get('/doctors/{id}', [DoctorController::class, 'showDoctorForPatient']);
-
+    
     
     Route::get('ct-scans', [CtScanController::class, 'index']);
     Route::get('ct-scans/{id}', [CtScanController::class, 'show']);
