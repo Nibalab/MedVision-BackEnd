@@ -221,4 +221,21 @@ class DoctorController extends Controller
             ], 500);
         }
     }
+
+    /**
+ * Display detailed information about a doctor.
+ *
+ * @param  int  $id
+ * @return \Illuminate\Http\Response
+ */
+public function showDoctorForPatient($id)
+{
+    $doctor = Doctor::with('user') // Get associated user (doctor's account details)
+        ->findOrFail($id); // Fetch doctor with specified ID, or fail if not found
+    
+    return response()->json($doctor); // Return doctor data as JSON
+}
+
+
+
 }
