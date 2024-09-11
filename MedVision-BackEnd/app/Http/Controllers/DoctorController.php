@@ -236,6 +236,16 @@ public function showDoctorForPatient($id)
     return response()->json($doctor); // Return doctor data as JSON
 }
 
+public function searchDoctors(Request $request)
+{
+    $searchTerm = $request->input('name'); // Get the search term from the request
+    $doctors = User::where('role', 'doctor')  // Ensure you are only searching for users with the 'doctor' role
+                ->where('name', 'LIKE', '%' . $searchTerm . '%')  // Match doctors whose name contains the search term
+                ->with('doctor')  // Include the related doctor information
+                ->get();
+
+    return response()->json($doctors);
+}
 
 
 }
