@@ -13,6 +13,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\AdminLogController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Middleware\EnsureUserIsDoctor;
+use App\Http\Middleware\EnsureUserIsPatient;
 
 // Authentication routes
 Route::post('/register/doctor', [AuthController::class, 'registerDoctor']);
@@ -65,12 +66,16 @@ Route::middleware(['auth:api', EnsureUserIsDoctor::class])->group(function () {
 });
 
 // Patient routes (common user routes)
-Route::middleware(['auth:api', 'patient'])->group(function () {
+Route::middleware(['auth:api', EnsureUserIsPatient::class])->group(function () {
     // Appointment management by patient
     Route::post('appointments', [AppointmentController::class, 'store']); // Patient requests an appointment
     Route::put('appointments/{id}', [AppointmentController::class, 'update']); // Patient can update an appointment request
     Route::get('appointments', [AppointmentController::class, 'index']); // View appointments
     Route::get('appointments/{id}', [AppointmentController::class, 'show']); // View specific appointment
+
+    // In your routes/api.php file
+    Route::get('/doctors/{id}', [DoctorController::class, 'showDoctorForPatient']);
+
     
     Route::get('ct-scans', [CtScanController::class, 'index']);
     Route::get('ct-scans/{id}', [CtScanController::class, 'show']);
