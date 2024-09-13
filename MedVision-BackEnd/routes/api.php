@@ -66,12 +66,13 @@ Route::middleware(['auth:api', EnsureUserIsDoctor::class])->group(function () {
 });
 
 Route::get('/doctors/search', [DoctorController::class, 'searchDoctors']);
+Route::post('appointments', [AppointmentController::class, 'store']); 
 
 
 // Patient routes (common user routes)
 Route::middleware(['auth:api', EnsureUserIsPatient::class])->group(function () {
     // Appointment management by patient
-    Route::post('appointments', [AppointmentController::class, 'store']); // Patient requests an appointment
+    
     Route::put('appointments/{id}', [AppointmentController::class, 'update']); // Patient can update an appointment request
     Route::get('appointments', [AppointmentController::class, 'index']); // View appointments
     Route::get('appointments/{id}', [AppointmentController::class, 'show']); // View specific appointment
@@ -100,4 +101,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('messages/{id}/read', [MessageController::class, 'markAsRead']);
     Route::delete('messages/{id}', [MessageController::class, 'destroy']);
     Route::get('/search', [UserController::class, 'search']);
+    Route::post('/patient/messages', [MessageController::class, 'sendMessageFromPatient']);
+Route::get('/patient/conversations', [MessageController::class, 'getPatientConversations']);
+
 });
