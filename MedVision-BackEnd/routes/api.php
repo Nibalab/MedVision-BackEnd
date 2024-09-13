@@ -102,6 +102,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::delete('messages/{id}', [MessageController::class, 'destroy']);
     Route::get('/search', [UserController::class, 'search']);
     Route::post('/patient/messages', [MessageController::class, 'sendMessageFromPatient']);
-Route::get('/patient/conversations', [MessageController::class, 'getPatientConversations']);
+    Route::get('/patient/conversations', [MessageController::class, 'getPatientConversations']);
+    Route::get('/patients', [UserController::class, 'getAllPatients']);
+
 
 });

@@ -94,6 +94,31 @@ class UserController extends Controller
 }
 
 
-     
+public function getAllPatients(Request $request)
+{
+    try {
+        // Add search functionality if the 'name' parameter is provided
+        $query = User::where('role', 'patient');
+
+        if ($request->has('name')) {
+            $query->where('name', 'like', '%' . $request->input('name') . '%');
+        }
+
+        // Fetch the patients with pagination
+        $patients = $query->select('id', 'name', 'gender')->paginate(10);
+
+        return response()->json([
+            'success' => true,
+            'patients' => $patients,
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error fetching patients: ' . $e->getMessage(),
+        ], 500);
+    }
+}
+
+   
 
 }
