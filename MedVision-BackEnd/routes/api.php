@@ -104,6 +104,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/patient/messages', [MessageController::class, 'sendMessageFromPatient']);
     Route::get('/patient/conversations', [MessageController::class, 'getPatientConversations']);
     Route::get('/patients', [UserController::class, 'getAllPatients']);
+    Route::get('/patients/search', [UserController::class, 'searchPatients']);
+
 
 
 });

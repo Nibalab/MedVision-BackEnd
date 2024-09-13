@@ -118,6 +118,36 @@ public function getAllPatients(Request $request)
         ], 500);
     }
 }
+public function searchPatients(Request $request)
+{
+    try {
+        // Ensure that a search query (name) is provided
+        $searchTerm = $request->input('name');
+
+        if (!$searchTerm) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Search term is required.'
+            ], 400);
+        }
+
+        // Search for patients whose names match the search term
+        $patients = User::where('role', 'patient') // Assuming 'role' defines user type
+                        ->where('name', 'like', '%' . $searchTerm . '%')
+                        ->select('id', 'name', 'gender') // Specify the fields needed
+                        ->paginate(10); // Optional: Paginate the results
+
+        return response()->json([
+            'success' => true,
+            'patients' => $patients,
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error searching patients: ' . $e->getMessage(),
+        ], 500);
+    }
+}
 
    
 
