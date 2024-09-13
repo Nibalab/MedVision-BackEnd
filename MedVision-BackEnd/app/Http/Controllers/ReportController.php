@@ -19,7 +19,6 @@ class ReportController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'ct_scan_id' => 'required|exists:ct_scans,id',
             'doctor_id' => 'required|exists:users,id',
             'patient_id' => 'required|exists:users,id',
             'report_document' => 'required|file|mimes:pdf,doc,docx|max:2048', // Validate document file
@@ -30,7 +29,6 @@ class ReportController extends Controller
 
         // Create the report record with the file path
         $report = Report::create([
-            'ct_scan_id' => $request->ct_scan_id,
             'doctor_id' => $request->doctor_id,
             'patient_id' => $request->patient_id,
             'file_path' => $filePath,
@@ -107,4 +105,6 @@ class ReportController extends Controller
 
         return response()->json(['error' => 'File not found'], 404);
     }
+
+    
 }

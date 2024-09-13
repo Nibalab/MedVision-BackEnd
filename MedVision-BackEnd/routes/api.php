@@ -90,7 +90,7 @@ Route::middleware(['auth:api', EnsureUserIsPatient::class])->group(function () {
     // Report routes for patients
     Route::get('reports', [ReportController::class, 'index']); // Patient views their reports
     Route::get('reports/{id}', [ReportController::class, 'show']); // View a specific report
-    Route::get('reports/download/{id}', [ReportController::class, 'downloadReport']); // Patient downloads the report document
+    
 });
 
 // Common routes for authenticated users (e.g., both patients and doctors)
@@ -105,7 +105,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/patient/conversations', [MessageController::class, 'getPatientConversations']);
     Route::get('/patients', [UserController::class, 'getAllPatients']);
     Route::get('/patients/search', [UserController::class, 'searchPatients']);
-
+    Route::get('reports/download/{id}', [ReportController::class, 'downloadReport']);
 
 
 });
