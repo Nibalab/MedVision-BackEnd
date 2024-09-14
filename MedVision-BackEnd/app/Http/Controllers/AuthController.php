@@ -68,13 +68,10 @@ class AuthController extends Controller
         ]);
     
         try {
-            // Handle profile picture upload
             $profilePicturePath = null;
             if ($request->hasFile('profile_picture')) {
-                // Log the file upload for debugging
                 \Log::info('Patient profile picture upload: ' . $request->file('profile_picture')->getClientOriginalName());
     
-                // Store the profile picture and log the path
                 $profilePicturePath = $request->file('profile_picture')->store('public/profile_pictures');
                 \Log::info('Stored patient profile picture at: ' . $profilePicturePath);
             }

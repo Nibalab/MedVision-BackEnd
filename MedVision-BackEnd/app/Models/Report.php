@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Report extends Model
 {
     use HasFactory;
-    protected $fillable = ['ct_scan_id', 'doctor_id', 'patient_id', 'report_content', 'status'];
+    protected $fillable = ['ct_scan_id', 'doctor_id', 'patient_id', 'report_content', 'file_path'];
 
     public function ctScan()
     {

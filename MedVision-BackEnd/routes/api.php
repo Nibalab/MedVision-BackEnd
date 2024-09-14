@@ -105,7 +105,10 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/patient/conversations', [MessageController::class, 'getPatientConversations']);
     Route::get('/patients', [UserController::class, 'getAllPatients']);
     Route::get('/patients/search', [UserController::class, 'searchPatients']);
-    Route::get('reports/download/{id}', [ReportController::class, 'downloadReport']);
+    Route::post('/patients/{patient}/upload-report', [ReportController::class, 'storeReport']);
+    Route::get('patients/{patientId}/download-report', [ReportController::class, 'downloadReport']);
+
+
 
 
 });
