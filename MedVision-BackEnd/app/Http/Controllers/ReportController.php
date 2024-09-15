@@ -150,6 +150,16 @@ class ReportController extends Controller
         return response()->json(['error' => 'File upload failed'], 400);
     }
 
-
+    public function getReports(Request $request) {
+        $user = auth()->user();
+        
+        // Assuming 'reports' table has patient_id and is related to doctors.
+        $reports = Report::where('patient_id', $user->id)
+            ->with('doctor')
+            ->get();
+        
+        return response()->json(['reports' => $reports]);
+    }
+    
 
 }

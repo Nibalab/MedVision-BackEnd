@@ -107,6 +107,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/patients/search', [UserController::class, 'searchPatients']);
     Route::post('/patients/{patient}/upload-report', [ReportController::class, 'storeReport']);
     Route::get('patients/{patientId}/download-report', [ReportController::class, 'downloadReport']);
+    Route::get('/patient/reports', [ReportController::class, 'getReports']);
 
 
 
