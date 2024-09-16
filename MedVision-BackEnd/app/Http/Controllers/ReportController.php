@@ -161,5 +161,22 @@ class ReportController extends Controller
         return response()->json(['reports' => $reports]);
     }
     
+    public function getLatestReport(Request $request) {
+        $user = auth()->user();
+        
+        // Fetch the latest report based on patient_id and load the doctor relationship
+        $latestReport = Report::where('patient_id', $user->id)
+            ->with('doctor') // Ensure to load doctor details
+            ->latest()       // Get the latest report
+            ->first();       // Fetch the first record (most recent one)
+        
+        // Check if a report exists
+        if (!$latestReport) {
+            return response()->json(['error' => 'No report found for this patient'], 404);
+        }
+        
+        return response()->json(['latestReport' => $latestReport], 200);
+    }
+    
 
 }

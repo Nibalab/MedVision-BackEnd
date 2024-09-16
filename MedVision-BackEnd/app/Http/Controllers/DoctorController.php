@@ -262,6 +262,49 @@ public function searchDoctors(Request $request)
 }
 
 
+public function getDoctorStats()
+{
+    try {
+        // Count of total CT Scans for all doctors
+        $totalCtScans = CtScan::count();
+
+        // Count of total doctors in the system
+        $totalDoctors = User::where('role', 'doctor')->count();
+
+        // Count of new doctors (registered within the last week)
+        $newDoctors = User::where('role', 'doctor')
+            ->where('created_at', '>=', now()->subWeek())
+            ->count();
+
+        // Count of old doctors (registered more than a week ago)
+        $oldDoctors = User::where('role', 'doctor')
+            ->where('created_at', '<', now()->subWeek())
+            ->count();
+
+        // Fetch today's appointments for all doctors
+        $appointmentsToday = Appointment::with('doctor', 'patient')
+            ->whereDate('appointment_date', now()->format('Y-m-d'))
+            ->get();
+
+        // Count of today's appointments for all doctors
+        $totalAppointmentsToday = $appointmentsToday->count();
+
+        // Return all stats including today's appointments
+        return response()->json([
+            'totalCtScans' => $totalCtScans,
+            'totalDoctors' => $totalDoctors,
+            'newDoctors' => $newDoctors,
+            'oldDoctors' => $oldDoctors,
+            'totalAppointmentsToday' => $totalAppointmentsToday,
+            'appointmentsToday' => $appointmentsToday, // List of today's appointments with doctor and patient details
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'An error occurred while fetching the doctor stats',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
 
 
 

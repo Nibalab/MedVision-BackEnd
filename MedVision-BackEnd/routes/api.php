@@ -108,6 +108,14 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/patients/{patient}/upload-report', [ReportController::class, 'storeReport']);
     Route::get('patients/{patientId}/download-report', [ReportController::class, 'downloadReport']);
     Route::get('/patient/reports', [ReportController::class, 'getReports']);
+    Route::get('/patient/message', [UserController::class, 'getNewMessages']);
+    
+    // Route for fetching confirmed appointments
+    Route::get('/patient/confirmed-appointments', [UserController::class, 'getConfirmedAppointments']);
+
+    // Route for fetching new reports
+    Route::get('/patient/new-reports', [UserController::class, 'getNewReports']);
+    Route::get('/patient/latest-report', [ReportController::class, 'getLatestReport']);
 
 
 

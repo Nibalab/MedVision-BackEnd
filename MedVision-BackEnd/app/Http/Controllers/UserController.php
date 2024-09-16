@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Doctor;
+use App\Models\Message;
+use App\Models\Appointment;
+use App\Models\Report;
+use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Http\Request;
 
@@ -149,6 +153,60 @@ public function searchPatients(Request $request)
     }
 }
 
-   
+public function getNewMessages()
+{
+    $userId = Auth::id();
+
+    // Fetch unread messages where the receiver is the current user
+    $messages = Message::where('receiver_id', $userId)
+                ->where('receiver_type', 'App\Models\User') // Assuming the receiver is always a User model
+                ->where('is_read', false)
+                ->with('sender') // Load the polymorphic sender
+                ->get();
+
+    // Filter messages where the sender is a doctor
+    $doctorMessages = $messages->filter(function ($message) {
+        return $message->sender_type === 'App\Models\Doctor'; // Check if the sender is a Doctor
+    });
+
+    return response()->json([
+        'messages' => $doctorMessages
+    ]);
+}
+
+
+public function getConfirmedAppointments()
+{
+    $userId = Auth::id();
+
+    // Fetching confirmed appointments for the logged-in patient
+    $confirmedAppointments = Appointment::where('patient_id', $userId)
+                              ->where('status', 'confirmed')
+                              ->with('doctor.user') // Load the doctor and their user details
+                              ->get();
+
+    return response()->json([
+        'confirmedAppointments' => $confirmedAppointments
+    ]);
+}
+
+
+     public function getNewReports()
+    {
+        $userId = Auth::id();
+
+        // Fetch new reports for the logged-in patient
+        $newReports = Report::where('patient_id', $userId)
+                    ->latest()  // Get the latest reports first
+                    ->with('doctor') // Assuming you have a relationship with doctor
+                    ->get();
+
+        return response()->json([
+            'newReports' => $newReports
+        ]);
+    }
+
+    
+
 
 }

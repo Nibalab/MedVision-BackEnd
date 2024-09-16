@@ -18,6 +18,6 @@ class Appointment extends Model
     // Relationship to the doctor
     public function doctor()
     {
-        return $this->belongsTo(User::class, 'doctor_id');
+        return $this->belongsTo(Doctor::class, 'doctor_id');
     }
 }
