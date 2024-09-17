@@ -230,6 +230,29 @@ public function updatePatient(Request $request, $id)
     }
 }
 
+public function deleteDoctor($id)
+{
+    try {
+        // Find the user with the 'doctor' role
+        $user = User::where('role', 'doctor')->findOrFail($id);
+
+        // Delete the associated doctor profile
+        $doctor = Doctor::where('user_id', $id)->first();
+        if ($doctor) {
+            $doctor->delete();
+        }
+
+        // Delete the user record
+        $user->delete();
+
+        return response()->json([
+            'message' => 'Doctor deleted successfully',
+        ]);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Error deleting doctor', 'error' => $e->getMessage()], 500);
+    }
+}
+
 
 
 }
