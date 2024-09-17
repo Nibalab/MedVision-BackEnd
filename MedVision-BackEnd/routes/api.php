@@ -38,7 +38,8 @@ Route::middleware(['auth:api', EnsureUserIsAdmin::class])->group(function () {
     Route::get('/admin/patients', [AdminLogController::class, 'getAllPatients']);
     Route::put('/admin/doctors/{doctorId}', [AdminLogController::class, 'updateDoctor']);
     Route::put('/admin/patients/{id}/update', [AdminLogController::class, 'updatePatient']);
-    Route::delete('doctors/{id}/delete', [AdminLogController::class, 'deleteDoctor']);
+    Route::delete('/admin/doctors/{doctorId}', [AdminLogController::class, 'deleteDoctor']);
+    Route::delete('/admin/patients/{patientId}', [AdminLogController::class, 'deletePatient']);
 
 
 

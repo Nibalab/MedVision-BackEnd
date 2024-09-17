@@ -230,29 +230,49 @@ public function updatePatient(Request $request, $id)
     }
 }
 
-public function deleteDoctor($id)
+// Delete Doctor Function in AdminLogController.php
+
+public function deleteDoctor($doctorId)
 {
     try {
-        // Find the user with the 'doctor' role
-        $user = User::where('role', 'doctor')->findOrFail($id);
-
-        // Delete the associated doctor profile
-        $doctor = Doctor::where('user_id', $id)->first();
-        if ($doctor) {
-            $doctor->delete();
+        // Find the doctor and associated user
+        $doctor = Doctor::find($doctorId);
+        if (!$doctor) {
+            return response()->json(['message' => 'Doctor not found'], 404);
         }
 
-        // Delete the user record
-        $user->delete();
+        // Delete the user associated with the doctor
+        $user = User::find($doctor->user_id);
+        if ($user) {
+            $user->delete(); // This will delete the user and the associated doctor due to the foreign key
+        }
 
-        return response()->json([
-            'message' => 'Doctor deleted successfully',
-        ]);
+        return response()->json(['message' => 'Doctor deleted successfully'], 200);
     } catch (\Exception $e) {
         return response()->json(['message' => 'Error deleting doctor', 'error' => $e->getMessage()], 500);
     }
 }
 
+// Delete Patient Function in AdminLogController.php
+
+public function deletePatient($patientId)
+{
+    try {
+        // Find the patient (assuming role is defined)
+        $user = User::where('role', 'patient')->find($patientId);
+
+        if (!$user) {
+            return response()->json(['message' => 'Patient not found'], 404);
+        }
+
+        // Delete the user (and thereby the patient record)
+        $user->delete();
+
+        return response()->json(['message' => 'Patient deleted successfully'], 200);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Error deleting patient', 'error' => $e->getMessage()], 500);
+    }
+}
 
 
 }
