@@ -99,6 +99,46 @@ class AuthController extends Controller
         }
     }
     
+    public function registerAdmin(Request $request)
+    {
+        // Validate incoming request data
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validate the profile picture
+        ]);
+    
+        try {
+            // Create user with admin role
+            $user = User::create([
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'password' => Hash::make($validatedData['password']),
+                'role' => 'admin', // Set role as admin
+            ]);
+    
+            // Handle the profile picture upload
+            if ($request->hasFile('profile_picture')) {
+                $path = $request->file('profile_picture')->store('public/profile_pictures');
+                $user->profile_picture = $path;
+                $user->save(); // Save the user with the profile picture path
+            }
+    
+            // Generate JWT token for the new admin
+            $token = JWTAuth::fromUser($user);
+    
+            return response()->json([
+                'message' => 'Admin registered successfully',
+                'token' => $token,
+                'user' => $user,
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Registration failed, please try again.'], 500);
+        }
+    }
+    
+
 
     // Login a user and return the token
     public function login(Request $request)

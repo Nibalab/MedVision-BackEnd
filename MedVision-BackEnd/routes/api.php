@@ -14,20 +14,25 @@ use App\Http\Controllers\AdminLogController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Middleware\EnsureUserIsDoctor;
 use App\Http\Middleware\EnsureUserIsPatient;
+use App\Http\Middleware\EnsureUserIsAdmin;
 
 // Authentication routes
 Route::post('/register/doctor', [AuthController::class, 'registerDoctor']);
 Route::post('/register/patient', [AuthController::class, 'registerPatient']);
+Route::post('register/admin', [AuthController::class, 'registerAdmin']);
+
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api');
 Route::get('/me', [AuthController::class, 'me'])->middleware('auth:api');
 
 // Admin routes
-Route::middleware(['auth:api', 'admin'])->group(function () {
+Route::middleware(['auth:api', EnsureUserIsAdmin::class])->group(function () {
     Route::get('users', [UserController::class, 'index']);
     Route::get('users/{id}', [UserController::class, 'show']);
     Route::put('users/{id}', [UserController::class, 'update']);
     Route::delete('users/{id}', [UserController::class, 'destroy']);
+    Route::get('admin-dashboard/stats', [AdminLogController::class, 'getAdminDashboardStats']);
+    
     
     Route::get('admin-logs', [AdminLogController::class, 'index']);
     Route::get('admin-logs/{id}', [AdminLogController::class, 'show']);

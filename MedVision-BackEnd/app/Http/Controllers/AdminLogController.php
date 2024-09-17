@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
+use App\Models\Doctor;
+use Illuminate\Support\Facades\Auth;
 
 class AdminLogController extends Controller
 {
@@ -41,4 +44,42 @@ class AdminLogController extends Controller
 
         return response()->json(['message' => 'Admin log deleted successfully']);
     }
+
+
+    public function getAdminDashboardStats()
+    {
+        try {
+            // Count of total doctors
+            $totalDoctors = User::doctors()->count();
+    
+            // Count of new doctors (registered within the last week)
+            $newDoctors = User::doctors()->where('created_at', '>=', now()->subWeek())->count();
+    
+            // Count of old doctors (registered more than a week ago)
+            $oldDoctors = $totalDoctors - $newDoctors;
+    
+            // Count of total patients
+            $totalPatients = User::patients()->count();
+    
+            // Count of new patients (registered within the last week)
+            $newPatients = User::patients()->where('created_at', '>=', now()->subWeek())->count();
+    
+            // Count of old patients (registered more than a week ago)
+            $oldPatients = $totalPatients - $newPatients;
+    
+            return response()->json([
+                'totalDoctors' => $totalDoctors,
+                'newDoctors' => $newDoctors,
+                'oldDoctors' => $oldDoctors,
+                'totalPatients' => $totalPatients,
+                'newPatients' => $newPatients,
+                'oldPatients' => $oldPatients,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to fetch admin dashboard stats'], 500);
+        }
+    }
+    
+
+
 }
