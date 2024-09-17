@@ -199,6 +199,37 @@ public function updateDoctor(Request $request, $id)
     }
 }
 
+public function updatePatient(Request $request, $id)
+{
+    // Validate the incoming request
+    $validatedData = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users,email,' . $id, // Ensure the email is unique except for the current patient
+        'gender' => 'required|string|in:male,female,other', // Validate gender as one of the allowed values
+    ]);
+
+    try {
+        // Find the user (patient) by ID
+        $user = User::findOrFail($id);
+
+        // Update the patient's information
+        $user->name = $validatedData['name'];
+        $user->email = $validatedData['email'];
+        $user->gender = $validatedData['gender'];
+
+        if ($user->isDirty()) {
+            $user->save(); // Save the changes if there are any modifications
+        }
+
+        return response()->json([
+            'message' => 'Patient updated successfully',
+            'updatedPatient' => $user,
+        ]);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Error updating patient', 'error' => $e->getMessage()], 500);
+    }
+}
+
 
 
 }
