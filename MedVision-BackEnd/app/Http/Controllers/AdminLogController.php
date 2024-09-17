@@ -82,6 +82,30 @@ class AdminLogController extends Controller
     
     public function searchDoctorsAdmin(Request $request)
 {
+    $searchTerm = $request->input('name'); 
+
+    
+    if (!$searchTerm) {
+        return response()->json(['message' => 'Search term is required'], 400);
+    }
+
+    
+    $doctors = Doctor::join('users', 'doctors.user_id', '=', 'users.id') 
+                    ->where('users.role', 'doctor') 
+                    ->where('users.name', 'LIKE', '%' . $searchTerm . '%') 
+                    ->select('doctors.*', 'users.name', 'users.email', 'users.profile_picture') 
+                    ->get();
+
+    
+    if ($doctors->isEmpty()) {
+        return response()->json(['message' => 'No doctors found for the given search criteria'], 404);
+    }
+
+    return response()->json($doctors);
+}
+
+public function searchPatientsAdmin(Request $request)
+{
     $searchTerm = $request->input('name'); // Get the search term from the request
 
     // Check if search term exists
@@ -89,19 +113,18 @@ class AdminLogController extends Controller
         return response()->json(['message' => 'Search term is required'], 400);
     }
 
-    // Query to search for doctors by the associated user's name
-    $doctors = Doctor::join('users', 'doctors.user_id', '=', 'users.id') // Join doctors with users table
-                    ->where('users.role', 'doctor') // Ensure we're searching for doctors
-                    ->where('users.name', 'LIKE', '%' . $searchTerm . '%') // Search for doctors by user name
-                    ->select('doctors.*', 'users.name', 'users.email', 'users.profile_picture') // Select doctor and user info
+    // Query to search for patients by name
+    $patients = User::where('role', 'patient') // Ensure we're searching for patients
+                    ->where('name', 'LIKE', '%' . $searchTerm . '%') // Search by patient name
+                    ->select('id', 'name', 'email', 'profile_picture') // Select required patient fields
                     ->get();
 
-    // Check if any doctors are found
-    if ($doctors->isEmpty()) {
-        return response()->json(['message' => 'No doctors found for the given search criteria'], 404);
+    // Check if any patients are found
+    if ($patients->isEmpty()) {
+        return response()->json(['message' => 'No patients found for the given search criteria'], 404);
     }
 
-    return response()->json($doctors);
+    return response()->json($patients);
 }
 
 
