@@ -106,20 +106,20 @@ class AdminLogController extends Controller
 
 public function searchPatientsAdmin(Request $request)
 {
-    $searchTerm = $request->input('name'); // Get the search term from the request
+    $searchTerm = $request->input('name'); 
 
-    // Check if search term exists
+    
     if (!$searchTerm) {
         return response()->json(['message' => 'Search term is required'], 400);
     }
 
-    // Query to search for patients by name
-    $patients = User::where('role', 'patient') // Ensure we're searching for patients
-                    ->where('name', 'LIKE', '%' . $searchTerm . '%') // Search by patient name
-                    ->select('id', 'name', 'email', 'profile_picture') // Select required patient fields
+    
+    $patients = User::where('role', 'patient') 
+                    ->where('name', 'LIKE', '%' . $searchTerm . '%') 
+                    ->select('id', 'name', 'email', 'profile_picture') 
                     ->get();
 
-    // Check if any patients are found
+    
     if ($patients->isEmpty()) {
         return response()->json(['message' => 'No patients found for the given search criteria'], 404);
     }
@@ -129,13 +129,11 @@ public function searchPatientsAdmin(Request $request)
 
 public function getAllDoctors()
 {
-    // Query to get all doctors and their associated user details
-    $doctors = Doctor::join('users', 'doctors.user_id', '=', 'users.id') // Join doctors with users table
-                    ->where('users.role', 'doctor') // Ensure we're only getting doctors
-                    ->select('doctors.*', 'users.name', 'users.email', 'users.profile_picture') // Select required doctor and user fields
+    $doctors = Doctor::join('users', 'doctors.user_id', '=', 'users.id') 
+                    ->where('users.role', 'doctor') 
+                    ->select('doctors.*', 'users.name', 'users.email', 'users.profile_picture') 
                     ->get();
 
-    // Check if any doctors are found
     if ($doctors->isEmpty()) {
         return response()->json(['message' => 'No doctors found'], 404);
     }
@@ -145,17 +143,60 @@ public function getAllDoctors()
 
 public function getAllPatients()
 {
-    // Query to get all users with the role 'patient'
-    $patients = User::where('role', 'patient') // Ensure we're only getting patients
-                    ->select('id', 'name', 'email', 'profile_picture', 'created_at') // Select required fields
+    
+    $patients = User::where('role', 'patient') 
+                    ->select('id', 'name', 'email', 'profile_picture', 'created_at') 
                     ->get();
 
-    // Check if any patients are found
     if ($patients->isEmpty()) {
         return response()->json(['message' => 'No patients found'], 404);
     }
 
     return response()->json($patients);
+}
+
+public function updateDoctor(Request $request, $id)
+{
+    $validatedData = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users,email,' . $id, // Ensure the email is unique, excluding the current user
+        'bio' => 'nullable|string|max:1000',
+        'contact_number' => 'nullable|string|max:15',
+        'address' => 'nullable|string|max:255',
+        'specialization' => 'required|string|max:255',
+    ]);
+
+    try {
+        // Update the user's information
+        $user = User::findOrFail($id);
+        $user->name = $validatedData['name'];
+        $user->email = $validatedData['email'];
+
+        if ($user->isDirty()) {
+            $user->save();
+        }
+
+        // Check if a doctor profile exists
+        $doctor = Doctor::where('user_id', $id)->first();
+        if (!$doctor) {
+            return response()->json(['message' => 'Doctor record not found for user ID: ' . $id], 404);
+        }
+
+        // Update the doctor's profile with new fields
+        $doctor->bio = $validatedData['bio'];
+        $doctor->contact_number = $validatedData['contact_number'];
+        $doctor->address = $validatedData['address'];
+        $doctor->specialization = $validatedData['specialization'];
+        $doctor->save();
+
+        return response()->json([
+            'message' => 'Doctor updated successfully',
+            'updatedUser' => $user,
+            'updatedDoctor' => $doctor,
+        ]);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Error updating doctor', 'error' => $e->getMessage()], 500);
+    }
 }
 
 
