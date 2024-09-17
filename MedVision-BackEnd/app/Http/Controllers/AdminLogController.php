@@ -143,6 +143,21 @@ public function getAllDoctors()
     return response()->json($doctors);
 }
 
+public function getAllPatients()
+{
+    // Query to get all users with the role 'patient'
+    $patients = User::where('role', 'patient') // Ensure we're only getting patients
+                    ->select('id', 'name', 'email', 'profile_picture', 'created_at') // Select required fields
+                    ->get();
+
+    // Check if any patients are found
+    if ($patients->isEmpty()) {
+        return response()->json(['message' => 'No patients found'], 404);
+    }
+
+    return response()->json($patients);
+}
+
 
 
 }
