@@ -127,5 +127,22 @@ public function searchPatientsAdmin(Request $request)
     return response()->json($patients);
 }
 
+public function getAllDoctors()
+{
+    // Query to get all doctors and their associated user details
+    $doctors = Doctor::join('users', 'doctors.user_id', '=', 'users.id') // Join doctors with users table
+                    ->where('users.role', 'doctor') // Ensure we're only getting doctors
+                    ->select('doctors.*', 'users.name', 'users.email', 'users.profile_picture') // Select required doctor and user fields
+                    ->get();
+
+    // Check if any doctors are found
+    if ($doctors->isEmpty()) {
+        return response()->json(['message' => 'No doctors found'], 404);
+    }
+
+    return response()->json($doctors);
+}
+
+
 
 }

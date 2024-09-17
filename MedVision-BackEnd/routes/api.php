@@ -34,6 +34,8 @@ Route::middleware(['auth:api', EnsureUserIsAdmin::class])->group(function () {
     Route::get('admin-dashboard/stats', [AdminLogController::class, 'getAdminDashboardStats']);
     Route::get('/admin/search-doctors', [AdminLogController::class, 'searchDoctorsAdmin']);
     Route::get('/admin/search-patients', [AdminLogController::class, 'searchPatientsAdmin']);
+    Route::get('/admin/doctors', [AdminLogController::class, 'getAllDoctors']);
+
 
     
     Route::get('admin-logs', [AdminLogController::class, 'index']);
