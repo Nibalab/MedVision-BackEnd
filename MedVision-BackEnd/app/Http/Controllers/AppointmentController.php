@@ -71,7 +71,6 @@ class AppointmentController extends Controller
         return response()->json(['message' => 'Appointment declined successfully', 'appointment' => $appointment]);
     }
 
-    // Delete an appointment
     public function destroy($id)
     {
         $appointment = Appointment::findOrFail($id);
