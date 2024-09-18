@@ -11,7 +11,6 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    // Register a new doctor
     public function registerDoctor(Request $request)
     {
         $validatedData = $request->validate([
@@ -23,7 +22,6 @@ class AuthController extends Controller
         ]);
     
         try {
-            // Create user with doctor role
             $user = User::create([
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
