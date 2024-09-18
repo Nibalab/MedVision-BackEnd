@@ -170,14 +170,13 @@ class DoctorController extends Controller
 
             $totalAppointmentsToday = $appointmentsToday->count();
 
-            // Return all stats including today's appointments
             return response()->json([
                 'totalCtScans' => $totalCtScans,
                 'totalPatients' => $totalPatients,
                 'newPatients' => $newPatients,
                 'oldPatients' => $oldPatients,
                 'totalAppointmentsToday' => $totalAppointmentsToday,
-                'appointmentsToday' => $appointmentsToday, // List of today's appointments
+                'appointmentsToday' => $appointmentsToday, 
             ]);
         } catch (\Exception $e) {
             return response()->json([
