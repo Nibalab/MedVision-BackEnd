@@ -220,26 +220,20 @@ public function showDoctorForPatient($id)
     $doctor = Doctor::with('user') 
         ->findOrFail($id); 
     
-    return response()->json($doctor); // Return doctor data as JSON
+    return response()->json($doctor); 
 }
 
 public function searchDoctors(Request $request)
 {
-    $searchTerm = $request->input('name'); // Get the search term from the request
-
-    // Check if search term exists
+    $searchTerm = $request->input('name'); 
     if (!$searchTerm) {
         return response()->json(['message' => 'Search term is required'], 400);
     }
-
-    // Query to search for doctors by the associated user's name
-    $doctors = Doctor::join('users', 'doctors.user_id', '=', 'users.id') // Join doctors with users table
-                    ->where('users.role', 'doctor') // Ensure we're searching for doctors
-                    ->where('users.name', 'LIKE', '%' . $searchTerm . '%') // Search for doctors by user name
-                    ->select('doctors.*', 'users.name', 'users.email', 'users.profile_picture') // Select doctor and user info
+    $doctors = Doctor::join('users', 'doctors.user_id', '=', 'users.id') 
+                    ->where('users.role', 'doctor') 
+                    ->where('users.name', 'LIKE', '%' . $searchTerm . '%') 
+                    ->select('doctors.*', 'users.name', 'users.email', 'users.profile_picture') 
                     ->get();
-
-    // Check if any doctors are found
     if ($doctors->isEmpty()) {
         return response()->json(['message' => 'No doctors found for the given search criteria'], 404);
     }
