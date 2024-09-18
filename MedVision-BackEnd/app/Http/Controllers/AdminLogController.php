@@ -54,8 +54,6 @@ class AdminLogController extends Controller
             $oldDoctors = $totalDoctors - $newDoctors;
             $totalPatients = User::patients()->count();
             $newPatients = User::patients()->where('created_at', '>=', now()->subWeek())->count();
-    
-            // Count of old patients (registered more than a week ago)
             $oldPatients = $totalPatients - $newPatients;
     
             return response()->json([
@@ -150,7 +148,7 @@ public function updateDoctor(Request $request, $id)
 {
     $validatedData = $request->validate([
         'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users,email,' . $id, // Ensure the email is unique, excluding the current user
+        'email' => 'required|string|email|max:255|unique:users,email,' . $id, 
         'bio' => 'nullable|string|max:1000',
         'contact_number' => 'nullable|string|max:15',
         'address' => 'nullable|string|max:255',
