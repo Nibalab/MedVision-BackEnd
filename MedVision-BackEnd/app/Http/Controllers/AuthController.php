@@ -110,8 +110,6 @@ class AuthController extends Controller
                 'password' => Hash::make($validatedData['password']),
                 'role' => 'admin', 
             ]);
-    
-            // Handle the profile picture upload
             if ($request->hasFile('profile_picture')) {
                 $path = $request->file('profile_picture')->store('public/profile_pictures');
                 $user->profile_picture = $path;
