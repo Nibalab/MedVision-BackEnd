@@ -29,11 +29,10 @@ class AuthController extends Controller
                 'role' => 'doctor',
             ]);
     
-            // Handle the profile picture upload
             if ($request->hasFile('profile_picture')) {
                 $path = $request->file('profile_picture')->store('public/profile_pictures');
                 $user->profile_picture = $path;
-                $user->save(); // Save the user with the profile picture path
+                $user->save(); 
             }
     
             // Create doctor profile
