@@ -29,7 +29,7 @@ class AppointmentController extends Controller
             'doctor_id' => $request->input('doctor_id'),
             'appointment_date' => $request->input('appointment_date'),
             'appointment_time' => $request->input('appointment_time'),
-            'status' => 'pending', // Set default status to pending for new requests
+            'status' => 'pending', 
         ]);
 
         return response()->json($appointment, 201);
