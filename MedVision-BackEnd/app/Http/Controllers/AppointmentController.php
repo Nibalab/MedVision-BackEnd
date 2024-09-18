@@ -34,14 +34,13 @@ class AppointmentController extends Controller
 
         return response()->json($appointment, 201);
     }
-    
+
     public function show($id)
     {
         $appointment = Appointment::with(['patient', 'doctor'])->findOrFail($id);
         return response()->json($appointment);
     }
 
-    // Update an existing appointment
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -56,7 +55,6 @@ class AppointmentController extends Controller
         return response()->json($appointment);
     }
 
-    // Accept an appointment request
     public function acceptAppointment($id)
     {
         $appointment = Appointment::findOrFail($id);
