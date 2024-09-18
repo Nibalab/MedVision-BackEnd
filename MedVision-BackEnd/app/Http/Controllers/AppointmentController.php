@@ -103,7 +103,6 @@ class AppointmentController extends Controller
         $startOfWeek = Carbon::now()->startOfWeek()->format('Y-m-d');
         $endOfWeek = Carbon::now()->endOfWeek()->format('Y-m-d');
 
-        // Fetch this week's appointments for the authenticated doctor
         $appointments = Appointment::where('doctor_id', $doctorId)
             ->whereBetween('appointment_date', [$startOfWeek, $endOfWeek])
             ->where('status', 'confirmed') // Optional: if you only want confirmed appointments
