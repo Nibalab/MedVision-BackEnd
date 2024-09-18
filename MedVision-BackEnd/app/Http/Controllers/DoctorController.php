@@ -152,32 +152,22 @@ class DoctorController extends Controller
     public function getDashboardStats()
     {
         try {
-            // Get the current authenticated doctor's ID
             $doctorId = Auth::user()->doctor->id;
-
-            // Count of total CT Scans for this doctor
             $totalCtScans = CtScan::where('doctor_id', $doctorId)->count();
-
-            // Count of total patients (all patients in the system)
             $totalPatients = User::where('role', 'patient')->count();
-
-            // Count of new patients (registered within the last week)
             $newPatients = User::where('role', 'patient')
                 ->where('created_at', '>=', now()->subWeek())
                 ->count();
 
-            // Count of old patients (registered more than a week ago)
             $oldPatients = User::where('role', 'patient')
                 ->where('created_at', '<', now()->subWeek())
                 ->count();
 
-            // Fetch today's appointments for the current doctor
             $appointmentsToday = Appointment::with('patient')
                 ->where('doctor_id', $doctorId)
                 ->whereDate('appointment_date', now()->format('Y-m-d'))
                 ->get();
 
-            // Count of today's appointments
             $totalAppointmentsToday = $appointmentsToday->count();
 
             // Return all stats including today's appointments
