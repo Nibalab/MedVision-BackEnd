@@ -212,12 +212,10 @@ public function updatePatient(Request $request, $id)
     }
 }
 
-// Delete Doctor Function in AdminLogController.php
 
 public function deleteDoctor($doctorId)
 {
     try {
-        // Find the doctor and associated user
         $doctor = Doctor::find($doctorId);
         if (!$doctor) {
             return response()->json(['message' => 'Doctor not found'], 404);
