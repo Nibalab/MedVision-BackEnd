@@ -156,7 +156,6 @@ public function updateDoctor(Request $request, $id)
     ]);
 
     try {
-        // Update the user's information
         $user = User::findOrFail($id);
         $user->name = $validatedData['name'];
         $user->email = $validatedData['email'];
@@ -164,14 +163,11 @@ public function updateDoctor(Request $request, $id)
         if ($user->isDirty()) {
             $user->save();
         }
-
-        // Check if a doctor profile exists
         $doctor = Doctor::where('user_id', $id)->first();
         if (!$doctor) {
             return response()->json(['message' => 'Doctor record not found for user ID: ' . $id], 404);
         }
 
-        // Update the doctor's profile with new fields
         $doctor->bio = $validatedData['bio'];
         $doctor->contact_number = $validatedData['contact_number'];
         $doctor->address = $validatedData['address'];
