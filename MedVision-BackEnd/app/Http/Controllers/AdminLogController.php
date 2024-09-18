@@ -49,10 +49,7 @@ class AdminLogController extends Controller
     public function getAdminDashboardStats()
     {
         try {
-            // Count of total doctors
             $totalDoctors = User::doctors()->count();
-    
-            // Count of new doctors (registered within the last week)
             $newDoctors = User::doctors()->where('created_at', '>=', now()->subWeek())->count();
     
             // Count of old doctors (registered more than a week ago)
