@@ -186,7 +186,6 @@ public function updateDoctor(Request $request, $id)
 
 public function updatePatient(Request $request, $id)
 {
-    // Validate the incoming request
     $validatedData = $request->validate([
         'name' => 'required|string|max:255',
         'email' => 'required|string|email|max:255|unique:users,email,' . $id, // Ensure the email is unique except for the current patient
