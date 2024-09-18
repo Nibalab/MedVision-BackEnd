@@ -76,12 +76,10 @@ class UserController extends Controller
     $searchQuery = $request->input('query');
 
     try {
-        // Search in users (patients) table
         $patients = User::where('name', 'like', '%' . $searchQuery . '%')
-                    ->where('role', 'patient')  // Assuming there's a role field to distinguish between patients and doctors
+                    ->where('role', 'patient')  
                     ->get();
 
-        // Search in doctors table by joining with users table via user_id
         $doctors = Doctor::join('users', 'doctors.user_id', '=', 'users.id')
                         ->where('users.name', 'like', '%' . $searchQuery . '%')
                         ->select('doctors.*', 'users.name as doctor_name')
@@ -101,14 +99,12 @@ class UserController extends Controller
 public function getAllPatients(Request $request)
 {
     try {
-        // Add search functionality if the 'name' parameter is provided
         $query = User::where('role', 'patient');
 
         if ($request->has('name')) {
             $query->where('name', 'like', '%' . $request->input('name') . '%');
         }
 
-        // Fetch the patients with pagination
         $patients = $query->select('id', 'name', 'gender')->paginate(10);
 
         return response()->json([
@@ -125,7 +121,6 @@ public function getAllPatients(Request $request)
 public function searchPatients(Request $request)
 {
     try {
-        // Ensure that a search query (name) is provided
         $searchTerm = $request->input('name');
 
         if (!$searchTerm) {
@@ -135,11 +130,10 @@ public function searchPatients(Request $request)
             ], 400);
         }
 
-        // Search for patients whose names match the search term
-        $patients = User::where('role', 'patient') // Assuming 'role' defines user type
+        $patients = User::where('role', 'patient') 
                         ->where('name', 'like', '%' . $searchTerm . '%')
-                        ->select('id', 'name', 'gender') // Specify the fields needed
-                        ->paginate(10); // Optional: Paginate the results
+                        ->select('id', 'name', 'gender') 
+                        ->paginate(10); 
 
         return response()->json([
             'success' => true,
@@ -157,16 +151,16 @@ public function getNewMessages()
 {
     $userId = Auth::id();
 
-    // Fetch unread messages where the receiver is the current user
+   
     $messages = Message::where('receiver_id', $userId)
-                ->where('receiver_type', 'App\Models\User') // Assuming the receiver is always a User model
+                ->where('receiver_type', 'App\Models\User') 
                 ->where('is_read', false)
-                ->with('sender') // Load the polymorphic sender
+                ->with('sender') 
                 ->get();
 
-    // Filter messages where the sender is a doctor
+   
     $doctorMessages = $messages->filter(function ($message) {
-        return $message->sender_type === 'App\Models\Doctor'; // Check if the sender is a Doctor
+        return $message->sender_type === 'App\Models\Doctor'; 
     });
 
     return response()->json([
@@ -178,11 +172,9 @@ public function getNewMessages()
 public function getConfirmedAppointments()
 {
     $userId = Auth::id();
-
-    // Fetching confirmed appointments for the logged-in patient
     $confirmedAppointments = Appointment::where('patient_id', $userId)
                               ->where('status', 'confirmed')
-                              ->with('doctor.user') // Load the doctor and their user details
+                              ->with('doctor.user') 
                               ->get();
 
     return response()->json([
@@ -195,10 +187,9 @@ public function getConfirmedAppointments()
     {
         $userId = Auth::id();
 
-        // Fetch new reports for the logged-in patient
         $newReports = Report::where('patient_id', $userId)
-                    ->latest()  // Get the latest reports first
-                    ->with('doctor') // Assuming you have a relationship with doctor
+                    ->latest()  
+                    ->with('doctor') 
                     ->get();
 
         return response()->json([
