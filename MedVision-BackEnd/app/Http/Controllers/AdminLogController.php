@@ -231,19 +231,15 @@ public function deleteDoctor($doctorId)
     }
 }
 
-// Delete Patient Function in AdminLogController.php
 
 public function deletePatient($patientId)
 {
     try {
-        // Find the patient (assuming role is defined)
         $user = User::where('role', 'patient')->find($patientId);
 
         if (!$user) {
             return response()->json(['message' => 'Patient not found'], 404);
         }
-
-        // Delete the user (and thereby the patient record)
         $user->delete();
 
         return response()->json(['message' => 'Patient deleted successfully'], 200);
