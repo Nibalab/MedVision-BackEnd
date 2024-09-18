@@ -188,8 +188,8 @@ public function updatePatient(Request $request, $id)
 {
     $validatedData = $request->validate([
         'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users,email,' . $id, // Ensure the email is unique except for the current patient
-        'gender' => 'required|string|in:male,female,other', // Validate gender as one of the allowed values
+        'email' => 'required|string|email|max:255|unique:users,email,' . $id, 
+        'gender' => 'required|string|in:male,female,other', 
     ]);
 
     try {
