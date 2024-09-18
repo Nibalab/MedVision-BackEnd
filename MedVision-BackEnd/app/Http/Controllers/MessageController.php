@@ -44,17 +44,13 @@ class MessageController extends Controller
 
     public function index(Request $request)
 {
-    $authUser = auth()->user();  // Get the authenticated user (can be patient or doctor)
-    $senderId = $request->input('sender_id', null);  // Optional sender_id parameter
-
-    // Query for both received and sent messages
+    $authUser = auth()->user();  
+    $senderId = $request->input('sender_id', null);  
     $messagesQuery = Message::where(function ($query) use ($authUser) {
-        // Received messages
-        $query->where('receiver_id', $authUser->id); // The receiver is the authenticated user (doctor's user_id or patient's id)
+        $query->where('receiver_id', $authUser->id); 
     })
     ->orWhere(function ($query) use ($authUser) {
-        // Sent messages
-        $query->where('sender_id', $authUser->id);  // The sender is the authenticated user (doctor's user_id or patient's id)
+        $query->where('sender_id', $authUser->id); 
     });
 
     // If sender_id is provided, filter the messages by that sender
