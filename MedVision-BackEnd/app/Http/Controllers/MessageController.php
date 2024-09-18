@@ -53,7 +53,6 @@ class MessageController extends Controller
         $query->where('sender_id', $authUser->id); 
     });
 
-    // If sender_id is provided, filter the messages by that sender
     if ($senderId) {
         $messagesQuery->where(function ($q) use ($senderId) {
             $q->where('sender_id', $senderId)
@@ -61,13 +60,11 @@ class MessageController extends Controller
         });
     }
 
-    $messages = $messagesQuery->with('sender')  // Load sender relationship to get user names
+    $messages = $messagesQuery->with('sender')  
         ->orderBy('created_at', 'desc')         // Order by latest message
         ->get();
 
-    // Map messages to include sender information
     $messagesWithSenderInfo = $messages->map(function ($message) {
-        // Ensure sender is not null before using get_class()
         $senderClass = $message->sender ? get_class($message->sender) : null;
 
         return [
@@ -87,9 +84,6 @@ class MessageController extends Controller
         'unread_count' => $messages->where('is_read', false)->count(),
     ]);
 }
-
-
-    
 
     public function show($id)
     {
@@ -117,7 +111,7 @@ class MessageController extends Controller
 {
     $message = Message::findOrFail($id);
 
-    // If the message is not read, update it
+
     if (!$message->is_read) {
         $message->is_read = true;
         $message->read_at = now();
@@ -129,9 +123,7 @@ class MessageController extends Controller
 
 public function sendMessageFromPatient(Request $request)
 {
-    \Log::info('Patient Message Request:', $request->all());
 
-    // Validate the incoming request
     $request->validate([
         'sender_type' => 'required|string|in:user',
         'sender_id' => 'required|integer',
@@ -140,18 +132,16 @@ public function sendMessageFromPatient(Request $request)
         'message_text' => 'required|string',
     ]);
 
-    // Find the doctor by ID to get the user_id
     $doctor = \App\Models\Doctor::find($request->input('receiver_id'));
     if (!$doctor) {
         return response()->json(['error' => 'Doctor not found.'], 404);
     }
 
-    // Use the doctor's user_id as the receiver_id
     $message = Message::create([
         'sender_type' => \App\Models\User::class,
-        'sender_id' => $request->input('sender_id'),  // Patient ID
-        'receiver_type' => \App\Models\User::class,   // Receiver is a User (doctor's user_id)
-        'receiver_id' => $doctor->user_id,            // Use the user_id of the doctor
+        'sender_id' => $request->input('sender_id'),  
+        'receiver_type' => \App\Models\User::class,   
+        'receiver_id' => $doctor->user_id,           
         'message_text' => $request->input('message_text'),
         'is_read' => false,
     ]);
@@ -163,7 +153,7 @@ public function sendMessageFromPatient(Request $request)
 
 public function getPatientConversations()
 {
-    $authUser = auth()->user(); // Get the authenticated patient
+    $authUser = auth()->user(); 
 
     if ($authUser->role !== 'patient') {
         return response()->json(['error' => 'Unauthorized'], 403); // Ensure only patients can access this route
