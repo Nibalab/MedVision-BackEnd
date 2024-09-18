@@ -10,11 +10,6 @@ class MessageController extends Controller
 {
     public function store(Request $request)
     {
-        \Log::info('Request Data:', $request->all()); // Log the incoming request data
-    
-        // Log the specific values you're interested in:
-        \Log::info('Sender ID:', ['sender_id' => $request->input('sender_id')]);
-        \Log::info('Sender Type:', ['sender_type' => $request->input('sender_type')]);
     
         $request->validate([
             'sender_type' => 'required|string|in:user,doctor',
@@ -22,7 +17,7 @@ class MessageController extends Controller
             'receiver_type' => 'required|string|in:user,doctor',
             'receiver_id' => 'required|integer',
             'message_text' => 'required|string',
-            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:10240', // Max 10MB file
+            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:10240', 
         ]);
         
         \Log::info('Sender ID:', ['sender_id' => $request->input('sender_id')]);
