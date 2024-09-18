@@ -105,7 +105,7 @@ class AppointmentController extends Controller
 
         $appointments = Appointment::where('doctor_id', $doctorId)
             ->whereBetween('appointment_date', [$startOfWeek, $endOfWeek])
-            ->where('status', 'confirmed') // Optional: if you only want confirmed appointments
+            ->where('status', 'confirmed')
             ->get();
 
         return response()->json($appointments);
