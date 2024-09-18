@@ -34,8 +34,7 @@ class AppointmentController extends Controller
 
         return response()->json($appointment, 201);
     }
-
-    // Show a specific appointment with patient and doctor details
+    
     public function show($id)
     {
         $appointment = Appointment::with(['patient', 'doctor'])->findOrFail($id);
