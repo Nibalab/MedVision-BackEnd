@@ -156,10 +156,9 @@ public function getPatientConversations()
     $authUser = auth()->user(); 
 
     if ($authUser->role !== 'patient') {
-        return response()->json(['error' => 'Unauthorized'], 403); // Ensure only patients can access this route
+        return response()->json(['error' => 'Unauthorized'], 403); 
     }
 
-    // Fetch distinct doctors that the patient has exchanged messages with
     $conversations = Message::where('sender_id', $authUser->id)
         ->orWhere('receiver_id', $authUser->id)
         ->with(['sender', 'receiver'])
@@ -168,7 +167,6 @@ public function getPatientConversations()
             return $message->sender_id === $authUser->id ? $message->receiver_id : $message->sender_id;
         });
 
-    // Format conversations for the frontend
     $formattedConversations = $conversations->map(function ($messages, $doctorId) use ($authUser) {
         $lastMessage = $messages->last(); // Get the last message exchanged
         $doctor = $lastMessage->sender_id === $authUser->id ? $lastMessage->receiver : $lastMessage->sender;
