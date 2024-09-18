@@ -100,7 +100,6 @@ class AppointmentController extends Controller
     public function getWeekAppointments()
     {
         $doctorId = Auth::user()->doctor->id; 
-        // Get the current week's start and end dates
         $startOfWeek = Carbon::now()->startOfWeek()->format('Y-m-d');
         $endOfWeek = Carbon::now()->endOfWeek()->format('Y-m-d');
 
