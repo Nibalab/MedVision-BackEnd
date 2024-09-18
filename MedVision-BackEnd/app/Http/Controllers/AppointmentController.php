@@ -20,7 +20,7 @@ class AppointmentController extends Controller
     {
         $request->validate([
             'patient_id' => 'required|exists:users,id', 
-            'doctor_id' => 'required|exists:users,id',   // Validating against the users table for doctors
+            'doctor_id' => 'required|exists:users,id',  
             'appointment_date' => 'required|date',
             'appointment_time' => 'required|date_format:H:i', // Validate time format
         ]);
