@@ -147,7 +147,6 @@ class AuthController extends Controller
             'user' => Auth::user(),
         ]);
     }
-    // Logout a user
     public function logout(Request $request)
 {
     try {
