@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Auth;
 
 class AppointmentController extends Controller
 {
-    // Fetch all appointments with patient and doctor relationships
     public function index()
     {
         $appointments = Appointment::with(['patient', 'doctor'])->get();
