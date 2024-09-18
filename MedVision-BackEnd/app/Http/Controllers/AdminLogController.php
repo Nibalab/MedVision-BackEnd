@@ -53,8 +53,6 @@ class AdminLogController extends Controller
             $newDoctors = User::doctors()->where('created_at', '>=', now()->subWeek())->count();
             $oldDoctors = $totalDoctors - $newDoctors;
             $totalPatients = User::patients()->count();
-    
-            // Count of new patients (registered within the last week)
             $newPatients = User::patients()->where('created_at', '>=', now()->subWeek())->count();
     
             // Count of old patients (registered more than a week ago)
