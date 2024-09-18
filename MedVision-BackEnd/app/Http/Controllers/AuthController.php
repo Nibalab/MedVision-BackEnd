@@ -113,7 +113,7 @@ class AuthController extends Controller
             if ($request->hasFile('profile_picture')) {
                 $path = $request->file('profile_picture')->store('public/profile_pictures');
                 $user->profile_picture = $path;
-                $user->save(); // Save the user with the profile picture path
+                $user->save(); 
             }
     
             // Generate JWT token for the new admin
