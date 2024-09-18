@@ -193,16 +193,14 @@ public function updatePatient(Request $request, $id)
     ]);
 
     try {
-        // Find the user (patient) by ID
         $user = User::findOrFail($id);
 
-        // Update the patient's information
         $user->name = $validatedData['name'];
         $user->email = $validatedData['email'];
         $user->gender = $validatedData['gender'];
 
         if ($user->isDirty()) {
-            $user->save(); // Save the changes if there are any modifications
+            $user->save(); 
         }
 
         return response()->json([
