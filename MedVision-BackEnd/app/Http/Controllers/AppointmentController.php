@@ -16,11 +16,10 @@ class AppointmentController extends Controller
         return response()->json($appointments);
     }
 
-    // Create a new appointment request
     public function store(Request $request)
     {
         $request->validate([
-            'patient_id' => 'required|exists:users,id', // Validating against the users table for patients
+            'patient_id' => 'required|exists:users,id', 
             'doctor_id' => 'required|exists:users,id',   // Validating against the users table for doctors
             'appointment_date' => 'required|date',
             'appointment_time' => 'required|date_format:H:i', // Validate time format
