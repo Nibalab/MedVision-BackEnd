@@ -84,10 +84,9 @@ class AppointmentController extends Controller
         $doctorId = Auth::user()->doctor->id; 
         $today = Carbon::now()->format('Y-m-d');
 
-        // Fetch today's appointments for the authenticated doctor
         $appointments = Appointment::where('doctor_id', $doctorId)
             ->whereDate('appointment_date', $today)
-            ->where('status', 'confirmed') // Optional: if you only want confirmed appointments
+            ->where('status', 'confirmed') 
             ->get();
 
         return response()->json($appointments);
