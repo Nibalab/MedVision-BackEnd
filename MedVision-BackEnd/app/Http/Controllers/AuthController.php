@@ -77,8 +77,8 @@ class AuthController extends Controller
                 'email' => $validatedData['email'],
                 'password' => Hash::make($validatedData['password']),
                 'role' => 'patient',  
-                'gender' => $validatedData['gender'], // Store the gender
-                'profile_picture' => $profilePicturePath, // Store profile picture path if uploaded
+                'gender' => $validatedData['gender'], 
+                'profile_picture' => $profilePicturePath,
             ]);
     
             $token = JWTAuth::fromUser($user);
