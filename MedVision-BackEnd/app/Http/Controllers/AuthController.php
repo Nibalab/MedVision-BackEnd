@@ -150,15 +150,12 @@ class AuthController extends Controller
     public function logout(Request $request)
 {
     try {
-        // Extract the token from the Authorization header
         $fullToken = $request->header('Authorization');
 
-        // Log the full token for debugging purposes
         \Log::info('Token: ' . $fullToken);
 
-        // Check if Authorization header exists and contains the Bearer token
         if ($fullToken && preg_match('/Bearer\s(\S+)/', $fullToken, $matches)) {
-            $token = $matches[1]; // Extract the actual token part (without 'Bearer')
+            $token = $matches[1]; 
 
             // Invalidate the token
             JWTAuth::setToken($token)->invalidate();
