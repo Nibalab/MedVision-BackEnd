@@ -81,9 +81,7 @@ class AppointmentController extends Controller
 
     public function getTodayAppointments()
     {
-        $doctorId = Auth::user()->doctor->id; // Assuming user is logged in as a doctor
-        
-        // Get today's date
+        $doctorId = Auth::user()->doctor->id; 
         $today = Carbon::now()->format('Y-m-d');
 
         // Fetch today's appointments for the authenticated doctor
