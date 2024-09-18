@@ -194,10 +194,7 @@ class DoctorController extends Controller
     public function getPendingAppointments()
     {
         try {
-            // Get the authenticated doctor's ID
             $doctorId = Auth::user()->doctor->id;
-
-            // Fetch pending appointments for this doctor
             $pendingAppointments = Appointment::with('patient')
                 ->where('doctor_id', $doctorId)
                 ->where('status', 'pending')
