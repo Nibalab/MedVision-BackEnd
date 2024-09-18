@@ -35,7 +35,6 @@ class AuthController extends Controller
                 $user->save(); 
             }
     
-            // Create doctor profile
             $doctor = Doctor::create([
                 'user_id' => $user->id,
                 'specialization' => $validatedData['specialization'],
@@ -53,7 +52,6 @@ class AuthController extends Controller
             return response()->json(['error' => 'Registration failed, please try again.'], 500);
         }
     }
-    // Register a new patient
     public function registerPatient(Request $request)
     {
         $validatedData = $request->validate([
