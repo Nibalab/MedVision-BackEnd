@@ -220,11 +220,9 @@ public function deleteDoctor($doctorId)
         if (!$doctor) {
             return response()->json(['message' => 'Doctor not found'], 404);
         }
-
-        // Delete the user associated with the doctor
         $user = User::find($doctor->user_id);
         if ($user) {
-            $user->delete(); // This will delete the user and the associated doctor due to the foreign key
+            $user->delete(); 
         }
 
         return response()->json(['message' => 'Doctor deleted successfully'], 200);
