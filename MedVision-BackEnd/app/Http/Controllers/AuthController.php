@@ -59,7 +59,7 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'gender' => 'required|string|in:male,female',
-            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validate the profile picture
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
         ]);
     
         try {
@@ -71,7 +71,7 @@ class AuthController extends Controller
                 \Log::info('Stored patient profile picture at: ' . $profilePicturePath);
             }
     
-            // Create the patient user
+         
             $user = User::create([
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
