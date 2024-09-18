@@ -22,10 +22,8 @@ class AppointmentController extends Controller
             'patient_id' => 'required|exists:users,id', 
             'doctor_id' => 'required|exists:users,id',  
             'appointment_date' => 'required|date',
-            'appointment_time' => 'required|date_format:H:i', // Validate time format
+            'appointment_time' => 'required|date_format:H:i', 
         ]);
-
-        // Create a pending appointment request
         $appointment = Appointment::create([
             'patient_id' => $request->input('patient_id'),
             'doctor_id' => $request->input('doctor_id'),
