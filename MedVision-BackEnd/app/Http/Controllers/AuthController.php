@@ -116,7 +116,6 @@ class AuthController extends Controller
                 $user->save(); 
             }
     
-            // Generate JWT token for the new admin
             $token = JWTAuth::fromUser($user);
     
             return response()->json([
@@ -130,8 +129,6 @@ class AuthController extends Controller
     }
     
 
-
-    // Login a user and return the token
     public function login(Request $request)
     {
         $request->validate([
