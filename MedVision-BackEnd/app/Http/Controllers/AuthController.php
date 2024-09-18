@@ -162,15 +162,12 @@ class AuthController extends Controller
 
         return response()->json(['error' => 'Failed to logout, no token found.'], 400);
     } catch (\Exception $e) {
-        \Log::error('Logout failed: ' . $e->getMessage());  // Log the error for further debugging
+        \Log::error('Logout failed: ' . $e->getMessage());  
         return response()->json(['error' => 'Failed to logout, please try again.'], 500);
     }
 }
 
 
-
-
-    // Get the authenticated user
     public function me()
     {
         return response()->json([
