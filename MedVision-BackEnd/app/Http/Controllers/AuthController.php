@@ -76,7 +76,7 @@ class AuthController extends Controller
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
                 'password' => Hash::make($validatedData['password']),
-                'role' => 'patient',  // Automatically assign the patient role
+                'role' => 'patient',  
                 'gender' => $validatedData['gender'], // Store the gender
                 'profile_picture' => $profilePicturePath, // Store profile picture path if uploaded
             ]);
