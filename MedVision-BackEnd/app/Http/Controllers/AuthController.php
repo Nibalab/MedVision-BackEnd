@@ -156,10 +156,7 @@ class AuthController extends Controller
 
         if ($fullToken && preg_match('/Bearer\s(\S+)/', $fullToken, $matches)) {
             $token = $matches[1]; 
-
-            // Invalidate the token
             JWTAuth::setToken($token)->invalidate();
-
             return response()->json(['message' => 'Successfully logged out']);
         }
 
