@@ -217,8 +217,8 @@ class DoctorController extends Controller
  */
 public function showDoctorForPatient($id)
 {
-    $doctor = Doctor::with('user') // Get associated user (doctor's account details)
-        ->findOrFail($id); // Fetch doctor with specified ID, or fail if not found
+    $doctor = Doctor::with('user') 
+        ->findOrFail($id); 
     
     return response()->json($doctor); // Return doctor data as JSON
 }
